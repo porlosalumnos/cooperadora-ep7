@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooperadora Escolar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: #f0f4f8;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .header .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header .logo h1 { font-size: 1.3rem; }
+        .header .logo p { font-size: 0.8rem; opacity: 0.9; }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+
+        .nav {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(135deg, #1e40af, #6d28d9);
+            color: white;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .hero h2 { font-size: 2.2rem; margin-bottom: 10px; }
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        /* MASCOTA */
+        .mascota-container {
+            text-align: center;
+            margin: -30px auto 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .mascota {
+            width: 120px;
+            height: 120px;
+            background: #fbbf24;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            border: 4px solid white;
+            animation: bounce 2s infinite;
+        }
+
+        .mascota-msg {
+            background: white;
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 20px;
+            margin-top: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-size: 1rem;
+            color: #4338ca;
+            font-weight: bold;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* BOTONES RÁPIDOS */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .quick-btn {
+            background: white;
+            border: none;
+            border-radius: 16px;
+            padding: 25px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+
+        .quick-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .quick-btn .icon { font-size: 2.5rem; margin-bottom: 10px; }
+        .quick-btn .label { font-weight: bold; font-size: 0.95rem; }
+
+        .quick-btn.pagar      { border-bottom: 4px solid #10b981; }
+        .quick-btn.donar      { border-bottom: 4px solid #f59e0b; }
+        .quick-btn.inscripcion{ border-bottom: 4px solid #3b82f6; }
+        .quick-btn.rifas      { border-bottom: 4px solid #ef4444; }
+        .quick-btn.chicos     { border-bottom: 4px solid #8b5cf6; }
+        .quick-btn.contacto   { border-bottom: 4px solid #06b6d4; }
+
+        /* SECCIONES */
+        .section {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #1e40af;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* CARDS */
+        .news-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            border-left: 4px solid #2563eb;
+        }
+
+        .news-card .date {
+            color: #6b7280;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .news-card h3 { color: #1e40af; margin-bottom: 8px; }
+        .news-card p  { color: #555; line-height: 1.6; }
+
+        /* PROGRESO */
+        .progress-section {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        .progress-item { margin-bottom: 20px; }
+
+        .progress-item .info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .progress-bar {
+            background: #e5e7eb;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .fill-green  { background: linear-gradient(90deg, #10b981, #34d399); }
+        .fill-blue   { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .fill-purple { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+
+        /* REDES */
+        .social-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 30px;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .social-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .social-btn.instagram {
+            background: linear-gradient(45deg,#f09433,#e6683c,
+                        #dc2743,#cc2366,#bc1888);
+        }
+        .social-btn.facebook  { background: #1877f2; }
+        .social-btn.whatsapp  { background: #25d366; }
+        .social-btn.youtube   { background: #ff0000; }
+        .social-btn.tiktok    { background: #000; }
+
+        /* FOOTER */
+        .footer {
+            background: #1e293b;
+            color: #94a3b8;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 40px;
+        }
+
+        .footer p { margin-bottom: 5px; }
+        .footer a  { color: #60a5fa; text-decoration: none; }
+
+        /* WHATSAPP FLOTANTE */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #25d366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(37,211,102,0.4);
+            z-index: 999;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(37,211,102,0.4); }
+            50%      { box-shadow: 0 0 0 15px rgba(37,211,102,0); }
+        }
+
+        /* MEMOTEST */
+        #memotest-board {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 10px;
+            margin-top: 15px;
+            max-width: 400px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            .nav {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                margin-top: 15px;
+            }
+            .nav.active { display: flex; }
+            .nav a { padding: 12px; text-align: center; border-radius: 10px; }
+            .hero h2 { font-size: 1.6rem; }
+            .quick-actions { grid-template-columns: repeat(2,1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="header">
+    <div class="logo">
+        <div>
+            <h1>🏫 Cooperadora Escolar</h1>
+            <p>Escuela N° 7 Juan Bautista Alberdi, San Miguel, Bs. As.</p>
+        </div>
+    </div>
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <nav class="nav" id="mainNav">
+        <a href="index.html" class="active">🏠 Inicio</a>
+        <a href="pagos.html">💳 Pagos</a>
+        <a href="#donaciones">💝 Donaciones</a>
+        <a href="https://TU-PAGINA-DE-RIFAS.com" target="_blank">🎰 Rifas</a>
+        <a href="#novedades">📰 Novedades</a>
+        <a href="#chicos">🎨 Rincón Chicos</a>
+        <a href="#contacto">📞 Contacto</a>
+    </nav>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+    <h2>¡Juntos hacemos una escuela mejor!</h2>
+    <p>
+        Somos la Cooperadora de la Escuela N° 7 Juan Bautista Alberdi, San Miguel, Buenos Aires. Año Centenario 1926-2026.
+        Cada aporte cuenta para mejorar la educación
+        de nuestros chicos.
+    </p>
+</section>
+
+<!-- ============ MASCOTA ============ -->
+<div class="mascota-container">
+    <div class="mascota">🦉</div>
+    <br>
+    <span class="mascota-msg" id="mascotaMsg">
+        ¡Hola! Soy Coope, tu guía. ¡Explorá la página!
+    </span>
+</div>
+
+<!-- ============ BOTONES RÁPIDOS ============ -->
+<div class="quick-actions">
+
+    <!-- ⬇️ ESTE BOTÓN VA A pagos.html -->
+    <a href="pagos.html" class="quick-btn pagar">
+        <div class="icon">💳</div>
+        <div class="label">Pagar Cuotas</div>
+    </a>
+
+    <a href="#donaciones" class="quick-btn donar">
+        <div class="icon">💝</div>
+        <div class="label">Donar</div>
+    </a>
+
+<a href="pagos.html" class="quick-btn inscripcion">
+        <div class="icon">📋</div>
+        <div class="label">Inscripción / Pagos</div>
+    </a>
+
+    <a href="libro-socios.html" class="quick-btn" style="border-bottom:4px solid #1e40af;">
+        <div class="icon">📖</div>
+        <div class="label">Libro de Socios</div>
+        <p style="font-size:0.7rem; color:#64748b; margin-top:4px;">Gestión oficial + Excel</p>
+    </a>
+
+    <!-- ⬇️ ESTE BOTÓN VA A TU PÁGINA DE RIFAS -->
+    <a href="https://TU-PAGINA-DE-RIFAS.com"
+       target="_blank" class="quick-btn rifas">
+        <div class="icon">🎰</div>
+        <div class="label">Rifas Online</div>
+    </a>
+
+    <a href="#chicos" class="quick-btn chicos">
+        <div class="icon">🎨</div>
+        <div class="label">Rincón Chicos</div>
+    </a>
+
+    <a href="#contacto" class="quick-btn contacto">
+        <div class="icon">📞</div>
+        <div class="label">Contacto</div>
+    </a>
+
+    <a href="https://wa.me/5491178244846" target="_blank" class="quick-btn" style="border-bottom:4px solid #25d366;">
+        <div class="icon">💬</div>
+        <div class="label">WhatsApp Cooperadora</div>
+        <p style="font-size:0.65rem; color:#166534; margin-top:3px; font-weight:bold;">+54 9 11 7824-4846</p>
+    </a>
+</div>
+
+<!-- ============ NOVEDADES ============ -->
+<div class="section" id="novedades">
+    <h2 class="section-title">📰 Últimas Novedades</h2>
+
+    <div class="news-card">
+        <div class="date">📅 15 de Julio 2025</div>
+        <h3>¡Nueva campaña solidaria!</h3>
+        <p>
+            Estamos juntando fondos para comprar libros
+            nuevos para la biblioteca. ¡Cada aporte suma!
+        </p>
+    </div>
+
+    <div class="news-card">
+        <div class="date">📅 10 de Julio 2025</div>
+        <h3>Rifa del mes de julio</h3>
+        <p>
+            ¡No te pierdas la rifa de este mes!
+            <a href="https://TU-PAGINA-DE-RIFAS.com"
+               target="_blank"
+               style="color:#2563eb; font-weight:bold;">
+               Comprá tu número acá →
+            </a>
+        </p>
+    </div>
+
+    <div class="news-card">
+        <div class="date">📅 5 de Julio 2025</div>
+        <h3>Gracias por sus aportes</h3>
+        <p>
+            Se compraron 10 ventiladores nuevos para
+            las aulas. ¡Gracias familias!
+        </p>
+    </div>
+</div>
+
+<!-- ============ TRANSPARENCIA ============ -->
+<div class="section">
+    <h2 class="section-title">📊 Nuestras Metas</h2>
+    <div class="progress-section">
+
+        <div class="progress-item">
+            <div class="info">
+                <span>📚 Libros para biblioteca</span>
+                <span>$45.000 / $60.000</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill fill-green"
+                     style="width:75%;">75%</div>
+            </div>
+        </div>
+
+        <div class="progress-item">
+            <div class="info">
+                <span>🖥️ Computadoras</span>
+                <span>$80.000 / $200.000</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill fill-blue"
+                     style="width:40%;">40%</div>
+            </div>
+        </div>
+
+        <div class="progress-item">
+            <div class="info">
+                <span>🎨 Pintura del edificio</span>
+                <span>$25.000 / $30.000</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill fill-purple"
+                     style="width:83%;">83%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ DONACIONES ============ -->
+<div class="section" id="donaciones">
+    <h2 class="section-title">💝 Donaciones</h2>
+    <div class="news-card" style="text-align:center;
+         border-left-color:#f59e0b;">
+        <h3>Cada aporte hace la diferencia</h3>
+        <p style="margin:15px 0;">
+            Elegí el monto que querés donar
+        </p>
+        <div style="display:flex; gap:10px;
+             justify-content:center; flex-wrap:wrap;">
+            <a href="pagos.html"
+               style="background:#f59e0b; color:white;
+               padding:12px 25px; border-radius:25px;
+               text-decoration:none; font-weight:bold;">
+               $1.000
+            </a>
+            <a href="pagos.html"
+               style="background:#f59e0b; color:white;
+               padding:12px 25px; border-radius:25px;
+               text-decoration:none; font-weight:bold;">
+               $2.500
+            </a>
+            <a href="pagos.html"
+               style="background:#f59e0b; color:white;
+               padding:12px 25px; border-radius:25px;
+               text-decoration:none; font-weight:bold;">
+               $5.000
+            </a>
+            <a href="pagos.html"
+               style="background:#ef4444; color:white;
+               padding:12px 25px; border-radius:25px;
+               text-decoration:none; font-weight:bold;">
+               Otro monto
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ============ RIFAS ============ -->
+<div class="section">
+    <h2 class="section-title">🎰 Rifas</h2>
+    <div class="news-card"
+         style="text-align:center;
+         border-left-color:#ef4444;
+         background:linear-gradient(135deg,#fef2f2,#fff);">
+        <div style="font-size:3rem;">🎉🎰🎉</div>
+        <h3 style="color:#dc2626; font-size:1.5rem;">
+            ¡Participá de nuestras rifas!
+        </h3>
+        <p style="margin:15px 0; font-size:1.1rem;">
+            Comprá tus números online y colaborá con la escuela
+        </p>
+        <a href="https://TU-PAGINA-DE-RIFAS.com"
+           target="_blank"
+           style="display:inline-block;
+           background:linear-gradient(135deg,#ef4444,#dc2626);
+           color:white; padding:15px 40px; border-radius:30px;
+           text-decoration:none; font-weight:bold;
+           font-size:1.1rem;
+           box-shadow:0 4px 15px rgba(239,68,68,0.4);">
+           🎰 Ir a Rifas Online →
+        </a>
+        <p style="margin-top:15px; color:#999; font-size:0.85rem;">
+            Se abrirá en una nueva ventana
+        </p>
+    </div>
+</div>
+
+<!-- ============ RINCÓN DE LOS CHICOS ============ -->
+<div class="section" id="chicos">
+    <h2 class="section-title">🎨 Rincón de los Chicos</h2>
+
+    <div style="text-align:center; margin-bottom:20px;">
+        <div class="mascota"
+             style="width:80px; height:80px; font-size:2rem;">
+             🦉
+        </div>
+        <p class="mascota-msg" style="margin-top:10px;">
+            ¡Hola chicos! Soy Coope. ¡Vengan a jugar!
+        </p>
+    </div>
+
+    <div style="display:grid;
+         grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+         gap:15px;">
+
+        <div class="quick-btn chicos"
+             onclick="playMemotest()"
+             style="cursor:pointer; border-bottom:4px solid #8b5cf6;">
+            <div class="icon">🧠</div>
+            <div class="label">Memotest</div>
+            <p style="font-size:0.8rem; color:#888;">
+                ¡Encontrá las parejas!
+            </p>
+        </div>
+
+        <div class="quick-btn chicos"
+             onclick="playTrivia()"
+             style="cursor:pointer; border-bottom:4px solid #8b5cf6;">
+            <div class="icon">❓</div>
+            <div class="label">Trivia Escolar</div>
+            <p style="font-size:0.8rem; color:#888;">
+                ¿Cuánto sabés?
+            </p>
+        </div>
+
+        <div class="quick-btn"
+             style="cursor:pointer; border-bottom:4px solid #8b5cf6;">
+            <div class="icon">🖼️</div>
+            <div class="label">Dibujo de la Semana</div>
+            <p style="font-size:0.8rem; color:#888;">
+                ¡Mandá tu dibujo!
+            </p>
+        </div>
+
+        <div class="quick-btn"
+             style="cursor:pointer; border-bottom:4px solid #8b5cf6;">
+            <div class="icon">⭐</div>
+            <div class="label">Desafío Semanal</div>
+            <p style="font-size:0.8rem; color:#888;">
+                Misión de esta semana
+            </p>
+        </div>
+    </div>
+
+    <!-- DESAFÍO -->
+    <div class="news-card" style="margin-top:20px;
+         border-left-color:#8b5cf6;
+         background:linear-gradient(135deg,#f5f3ff,#fff);">
+        <h3>⭐ Desafío de la Semana</h3>
+        <p style="font-size:1.2rem; margin:15px 0;
+           color:#6d28d9; font-weight:bold;">
+            "Dibujá cómo soñás el patio de la escuela"
+        </p>
+        <p>
+            Mandá tu dibujo por WhatsApp antes del viernes.
+            ¡Los mejores se publican en la página!
+        </p>
+    </div>
+
+    <!-- MEMOTEST -->
+    <div id="memotest-container"
+         style="display:none; margin-top:20px;">
+        <div class="news-card" style="border-left-color:#8b5cf6;">
+            <h3>🧠 Memotest</h3>
+            <p>Hacé clic en las tarjetas para
+               encontrar las parejas</p>
+            <div id="memotest-board"></div>
+            <p id="memotest-score"
+               style="margin-top:10px; font-weight:bold;
+               color:#6d28d9;"></p>
+            <button onclick="initMemotest()"
+                    style="margin-top:10px; padding:10px 20px;
+                    background:#8b5cf6; color:white; border:none;
+                    border-radius:20px; cursor:pointer;
+                    font-weight:bold;">
+                🔄 Jugar de nuevo
+            </button>
+        </div>
+    </div>
+
+    <!-- TRIVIA -->
+    <div id="trivia-container"
+         style="display:none; margin-top:20px;">
+        <div class="news-card" style="border-left-color:#3b82f6;">
+            <h3>❓ Trivia Escolar</h3>
+            <div id="trivia-question"></div>
+            <div id="trivia-options" style="margin-top:15px;"></div>
+            <p id="trivia-result"
+               style="margin-top:10px; font-weight:bold;"></p>
+            <button onclick="nextTrivia()"
+                    style="margin-top:10px; padding:10px 20px;
+                    background:#3b82f6; color:white; border:none;
+                    border-radius:20px; cursor:pointer;
+                    font-weight:bold;">
+                Siguiente →
+            </button>
+        </div>
+    </div>
+
+    <!-- INSIGNIAS -->
+    <div class="news-card" style="margin-top:20px;
+         border-left-color:#fbbf24;">
+        <h3>🏅 Insignias que podés ganar</h3>
+        <div style="display:flex; gap:20px;
+             flex-wrap:wrap; margin-top:15px;">
+            <div style="text-align:center;">
+                <div style="font-size:2.5rem;">🎨</div>
+                <p style="font-size:0.8rem; font-weight:bold;">Artista</p>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-size:2.5rem;">📚</div>
+                <p style="font-size:0.8rem; font-weight:bold;">Lector</p>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-size:2.5rem;">💚</div>
+                <p style="font-size:0.8rem; font-weight:bold;">Solidario</p>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-size:2.5rem;">🌱</div>
+                <p style="font-size:0.8rem; font-weight:bold;">Ecológico</p>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-size:2.5rem;">⭐</div>
+                <p style="font-size:0.8rem; font-weight:bold;">Participativo</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ REDES SOCIALES ============ -->
+<div class="section">
+    <h2 class="section-title">📱 Seguinos en Redes</h2>
+    <div class="social-bar">
+        <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5"
+           target="_blank" class="social-btn instagram">
+           📸 Instagram
+        </a>
+        <a href="https://www.facebook.com/share/1E58Lrkmvx/"
+           target="_blank" class="social-btn facebook">
+           📘 Facebook
+        </a>
+<a href="https://wa.me/5491178244846"
+           target="_blank" class="social-btn whatsapp">
+           💬 WhatsApp
+        </a>
+        <a href="https://youtube.com/TU_CANAL"
+           target="_blank" class="social-btn youtube">
+           ▶️ YouTube
+        </a>
+        <a href="https://tiktok.com/@TU_CUENTA"
+           target="_blank" class="social-btn tiktok">
+           🎵 TikTok
+        </a>
+    </div>
+</div>
+
+<!-- ============ CONTACTO ============ -->
+<div class="section" id="contacto">
+    <h2 class="section-title">📞 Contacto</h2>
+
+    <div class="news-card" style="border-left-color:#06b6d4;">
+        <h3>¿Tenés alguna consulta?</h3>
+        <p style="margin:10px 0; line-height:2;">
+            📍 <strong>Dirección:</strong> Serrano N° 1326, San Miguel, Buenos Aires<br>
+            📞 <strong>WhatsApp:</strong> +54 9 11 7824-4846<br>
+            📧 <strong>Email:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="64070b0b14011453240309050d084a070b09">[email&#160;protected]</a><br>
+            🕐 <strong>Horario:</strong> Lunes a Viernes de 8 a 12 hs
+        </p>
+    </div>
+
+    <div class="news-card" style="margin-top:15px;
+         border-left-color:#06b6d4;">
+        <h3>✉️ Envianos un mensaje</h3>
+        <form style="margin-top:15px;"
+              onsubmit="enviarFormulario(event)">
+            <input type="text" id="contactNombre"
+                   placeholder="Tu nombre"
+                   style="width:100%; padding:12px;
+                   border:2px solid #e5e7eb;
+                   border-radius:10px; margin-bottom:10px;
+                   font-size:1rem;">
+            <input type="email" id="contactEmail"
+                   placeholder="Tu email"
+                   style="width:100%; padding:12px;
+                   border:2px solid #e5e7eb;
+                   border-radius:10px; margin-bottom:10px;
+                   font-size:1rem;">
+            <textarea id="contactMsg"
+                      placeholder="Tu mensaje" rows="4"
+                      style="width:100%; padding:12px;
+                      border:2px solid #e5e7eb;
+                      border-radius:10px; margin-bottom:10px;
+                      font-size:1rem; resize:vertical;">
+            </textarea>
+            <button type="submit"
+                    style="background:#06b6d4; color:white;
+                    padding:12px 30px; border:none;
+                    border-radius:25px; cursor:pointer;
+                    font-weight:bold; font-size:1rem;">
+                Enviar Mensaje
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+    <p><strong>Cooperadora Escuela N° 7 Juan Bautista Alberdi</strong></p>
+    <p>Serrano N° 1326 — San Miguel — Buenos Aires</p>
+    <p>
+        <a href="/cdn-cgi/l/email-protection#fe9d91918e9b8ec9be99939f9792d09d9193"><span class="__cf_email__" data-cfemail="23404c4c5346531463444e424a4f0d404c4e">[email&#160;protected]</span></a> ·
+        <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5" target="_blank">Instagram</a> ·
+        <a href="https://www.facebook.com/share/1E58Lrkmvx/" target="_blank">Facebook</a>
+    </p>
+    <p style="margin-top:15px; font-size:0.8rem;">
+        © 2026 Cooperadora EP7 — Año Centenario 1926-2026
+    </p>
+</footer>
+
+<!-- WHATSAPP FLOTANTE -->
+<a href="https://wa.me/5491178244846" target="_blank"
+   class="whatsapp-float">💬</a>
+
+<!-- ============ JAVASCRIPT ============ -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+// MENÚ
+function toggleMenu() {
+    document.getElementById('mainNav')
+            .classList.toggle('active');
+}
+
+// MENSAJES MASCOTA
+const mensajes = [
+    "¡Hola! Soy Coope, tu guía. ¡Explorá la página!",
+    "¿Ya pagaste la cuota? ¡Es muy fácil!",
+    "¡Participá del desafío de la semana!",
+    "¡Donar es ayudar a todos!",
+    "¡No te pierdas la rifa del mes! 🎰",
+    "¿Jugamos al memotest? 🧠",
+    "¡Tu aporte hace la diferencia!"
+];
+
+let msgIdx = 0;
+setInterval(() => {
+    msgIdx = (msgIdx + 1) % mensajes.length;
+    const el = document.getElementById('mascotaMsg');
+    if (el) el.textContent = mensajes[msgIdx];
+}, 4000);
+
+// FORMULARIO CONTACTO → WHATSAPP
+function enviarFormulario(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('contactNombre').value;
+    const email  = document.getElementById('contactEmail').value;
+    const msg    = document.getElementById('contactMsg').value;
+
+    if (!nombre || !msg) {
+        alert('Completá nombre y mensaje');
+        return;
+    }
+
+    const txt = `Hola Cooperadora!\n*Nombre:* ${nombre}\n*Email:* ${email}\n*Mensaje:* ${msg}`;
+    window.open(`https://wa.me/5491178244846?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+// ============ MEMOTEST ============
+const emojis = [
+    '🌟','🌟','🎨','🎨','📚','📚','🦉','🦉',
+    '🌈','🌈','⚽','⚽','🎵','🎵','🌺','🌺'
+];
+
+let flipped = [], matched = 0, canClick = true;
+
+function playMemotest() {
+    document.getElementById('memotest-container').style.display = 'block';
+    document.getElementById('trivia-container').style.display   = 'none';
+    initMemotest();
+    document.getElementById('memotest-container')
+            .scrollIntoView({ behavior: 'smooth' });
+}
+
+function initMemotest() {
+    const board = document.getElementById('memotest-board');
+    board.innerHTML = '';
+    flipped = []; matched = 0; canClick = true;
+    document.getElementById('memotest-score').textContent = '';
+
+    const shuffled = [...emojis].sort(() => Math.random() - 0.5);
+
+    shuffled.forEach(emoji => {
+        const card = document.createElement('div');
+        card.style.cssText = `
+            width:100%; aspect-ratio:1;
+            background:#8b5cf6; border-radius:12px;
+            display:flex; align-items:center;
+            justify-content:center; font-size:2rem;
+            cursor:pointer; color:white;
+            transition:all 0.3s; user-select:none;
+        `;
+        card.textContent = '?';
+        card.dataset.emoji = emoji;
+        card.dataset.flipped = 'false';
+        card.onclick = () => flipCard(card);
+        board.appendChild(card);
+    });
+}
+
+function flipCard(card) {
+    if (!canClick || card.dataset.flipped === 'true'
+        || flipped.length >= 2) return;
+
+    card.textContent = card.dataset.emoji;
+    card.style.background = '#ddd8fe';
+    card.dataset.flipped = 'true';
+    flipped.push(card);
+
+    if (flipped.length === 2) {
+        canClick = false;
+        setTimeout(checkMatch, 800);
+    }
+}
+
+function checkMatch() {
+    const [a, b] = flipped;
+    if (a.dataset.emoji === b.dataset.emoji) {
+        a.style.background = '#10b981';
+        b.style.background = '#10b981';
+        matched += 2;
+        if (matched === emojis.length) {
+            document.getElementById('memotest-score').textContent =
+                '🎉 ¡Felicitaciones! ¡Encontraste todas las parejas!';
+        }
+    } else {
+        a.textContent = '?'; b.textContent = '?';
+        a.style.background = '#8b5cf6';
+        b.style.background = '#8b5cf6';
+        a.dataset.flipped = 'false';
+        b.dataset.flipped = 'false';
+    }
+    flipped = []; canClick = true;
+}
+
+// ============ TRIVIA ============
+const trivias = [
+    { q:"¿Cuántos colores tiene el arcoíris?",
+      opts:["5","7","10","3"], ans:1 },
+    { q:"¿Cuál es el planeta más grande?",
+      opts:["Marte","Venus","Júpiter","Tierra"], ans:2 },
+    { q:"¿Cuántas patas tiene una araña?",
+      opts:["6","4","8","10"], ans:2 },
+    { q:"¿En qué continente está Argentina?",
+      opts:["Europa","Asia","América del Sur","África"], ans:2 },
+    { q:"¿Qué gas necesitan las plantas?",
+      opts:["Oxígeno","Nitrógeno","Dióxido de carbono","Helio"], ans:2 },
+    { q:"¿Cuánto es 7 × 8?",
+      opts:["54","56","58","48"], ans:1 },
+    { q:"¿Cuál es el océano más grande?",
+      opts:["Atlántico","Índico","Ártico","Pacífico"], ans:3 }
+];
+
+let currentTrivia = 0;
+
+function playTrivia() {
+    document.getElementById('trivia-container').style.display   = 'block';
+    document.getElementById('memotest-container').style.display = 'none';
+    currentTrivia = 0;
+    showTrivia();
+    document.getElementById('trivia-container')
+            .scrollIntoView({ behavior: 'smooth' });
+}
+
+function showTrivia() {
+    const t = trivias[currentTrivia % trivias.length];
+    document.getElementById('trivia-question').innerHTML =
+        `<p style="font-size:1.2rem; font-weight:bold;
+         color:#1e40af;">${t.q}</p>`;
+    const opts = document.getElementById('trivia-options');
+    opts.innerHTML = '';
+    document.getElementById('trivia-result').textContent = '';
+
+    t.opts.forEach((op, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = op;
+        btn.style.cssText = `
+            display:block; width:100%; padding:12px;
+            margin:5px 0; background:#e0e7ff;
+            border:2px solid #c7d2fe; border-radius:10px;
+            cursor:pointer; font-size:1rem; text-align:left;
+        `;
+        btn.onclick = () => {
+            const res = document.getElementById('trivia-result');
+            if (i === t.ans) {
+                res.textContent = '✅ ¡Correcto! 🎉';
+                res.style.color = '#10b981';
+            } else {
+                res.textContent = '❌ ¡Casi! Era: ' + t.opts[t.ans];
+                res.style.color = '#ef4444';
+            }
+        };
+        opts.appendChild(btn);
+    });
+}
+
+function nextTrivia() {
+    currentTrivia++;
+    showTrivia();
+}
+
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a081dcccdf4f59a3',t:'MTc4MDg1ODQzNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
