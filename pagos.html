@@ -1609,41 +1609,51 @@
             </div>
         </div>
 
-        <!-- IMPORTAR -->
+        <!-- IMPORTAR (oculto por defecto, usar solo si no hay Google Sheets) -->
         <div class="form-card" style="margin-top:20px; background:linear-gradient(135deg,#fefce8,#fff); border:2px solid #fcd34d;">
             <h3>📥 Importar datos desde archivo</h3>
-            <p style="font-size:0.85rem;color:#92400e;margin-bottom:12px;">
-                Subí un archivo <strong>.csv</strong> o <strong>.txt</strong> con columnas para actualizar socios o bonos en masa. Requiere contraseña de admin.
-            </p>
-            <div class="form-row" style="align-items:end;">
-                <div class="form-group" style="margin-bottom:0; flex:1;">
-                    <label style="font-size:0.8rem;">Seleccionar archivo (.csv o .txt)</label>
-                    <input type="file" id="importFile" accept=".csv,.txt" style="padding:8px; font-size:0.85rem;" onchange="previewImportFile()">
-                </div>
-                <div class="form-group" style="margin-bottom:0; flex:1;">
-                    <label style="font-size:0.8rem;">Modo de importación</label>
-                    <select id="importMode" style="padding:10px; font-size:0.9rem;">
-                        <option value="merge">Fusionar (actualizar existentes, agregar nuevos)</option>
-                        <option value="replace">Reemplazar TODO (eliminar lo anterior)</option>
-                    </select>
-                </div>
+            <div id="importCloudMsg" style="display:none; background:#e0f2fe; border:1px solid #7dd3fc; border-radius:10px; padding:12px; margin-bottom:12px; color:#0c4a6e; font-size:0.9rem;">
+                💡 <strong>Usá Google Sheets para editar en masa.</strong> Hacé clic en "🔗 Probar Conexión" arriba. Si funciona, es mejor modificar datos desde la planilla en lugar de importar archivos.
             </div>
-            <div id="importPreviewBox" style="margin-top:15px; display:none;">
-                <div id="importPreviewStats" style="font-size:0.85rem; margin-bottom:10px; color:#475569;"></div>
-                <div style="max-height:250px; overflow:auto; border:1px solid #e5e7eb; border-radius:10px;">
-                    <table class="admin-table" style="min-width:100%; font-size:0.75rem;">
-                        <thead><tr id="importPreviewHead"></tr></thead>
-                        <tbody id="importPreviewBody"></tbody>
-                    </table>
-                </div>
+            <div id="importToggleBox">
+                <p style="font-size:0.85rem;color:#92400e;margin-bottom:10px;">
+                    Esta opción es para emergencias o uso sin conexión a Google Sheets. Preferiblemente usá la planilla de Google.
+                </p>
+                <button class="btn btn-secondary" onclick="document.getElementById('importPanel').classList.remove('hidden'); document.getElementById('importToggleBox').classList.add('hidden');" style="font-size:0.85rem; padding:8px 16px;">
+                    📂 Mostrar importación de archivo
+                </button>
             </div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">
-                <button class="btn btn-warning" onclick="applyImport()" id="btnApplyImport" style="display:none;">
-                    ⚠️ Aplicar importación
-                </button>
-                <button class="btn btn-secondary" onclick="cancelImport()">
-                    Cancelar
-                </button>
+            <div id="importPanel" class="hidden">
+                <div class="form-row" style="align-items:end;">
+                    <div class="form-group" style="margin-bottom:0; flex:1;">
+                        <label style="font-size:0.8rem;">Seleccionar archivo (.csv o .txt)</label>
+                        <input type="file" id="importFile" accept=".csv,.txt" style="padding:8px; font-size:0.85rem;" onchange="previewImportFile()">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0; flex:1;">
+                        <label style="font-size:0.8rem;">Modo de importación</label>
+                        <select id="importMode" style="padding:10px; font-size:0.9rem;">
+                            <option value="merge">Fusionar (actualizar existentes, agregar nuevos)</option>
+                            <option value="replace">Reemplazar TODO (eliminar lo anterior)</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="importPreviewBox" style="margin-top:15px; display:none;">
+                    <div id="importPreviewStats" style="font-size:0.85rem; margin-bottom:10px; color:#475569;"></div>
+                    <div style="max-height:250px; overflow:auto; border:1px solid #e5e7eb; border-radius:10px;">
+                        <table class="admin-table" style="min-width:100%; font-size:0.75rem;">
+                            <thead><tr id="importPreviewHead"></tr></thead>
+                            <tbody id="importPreviewBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">
+                    <button class="btn btn-warning" onclick="applyImport()" id="btnApplyImport" style="display:none;">
+                        ⚠️ Aplicar importación
+                    </button>
+                    <button class="btn btn-secondary" onclick="cancelImport(); document.getElementById('importPanel').classList.add('hidden'); document.getElementById('importToggleBox').classList.remove('hidden');">
+                        Cancelar
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -1668,8 +1678,8 @@
         <h3 style="margin-bottom: 12px; font-size: 1.1rem;">📬 Cooperadora Escuela N° 7 Juan Bautista Alberdi</h3>
         <p style="opacity: 0.9; margin-bottom: 15px; font-size: 0.9rem;">Año Centenario 1926-2026 — Serrano N° 1326 — San Miguel, Bs. As.</p>
         <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; align-items: center;">
-            <a href="/cdn-cgi/l/email-protection#3f5c50504f5a4f087f58525e5653115c5052" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
-                📧 <span class="__cf_email__" data-cfemail="f2919d9d829782c5b2959f939b9edc919d9f">[email&#160;protected]</span>
+            <a href="/cdn-cgi/l/email-protection#e0838f8f908590d7a0878d81898cce838f8d" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
+                📧 <span class="__cf_email__" data-cfemail="5f3c30302f3a2f681f38323e3633713c3032">[email&#160;protected]</span>
             </a>
             <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5" target="_blank" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
                 📷 Instagram
@@ -1743,7 +1753,7 @@ let CFG = {
 // ================================================================
 // CONFIGURACIÓN DE LA NUBE (Google Sheets)
 // ================================================================
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfSFetQrSrgRFXAVE7TqkOblVnXdeH4yqvQTjxm6_gkw7_Kwdn6FSMzE5iG4rQMLtE/exec';
+const APPS_SCRIPT_URL = 'PONER_URL_AQUI';
 const API_KEY_CLOUD = 'coop2026';
 
 // Cache en memoria (copia de trabajo)
@@ -2095,6 +2105,7 @@ async function init() {
     renderBonos();
     updateFiltroDivisiones();
     checkBloqueo();
+    checkImportVisibility();
 }
 
 function loadConfig() {
@@ -3273,7 +3284,11 @@ function verBonoModal(numBono) {
     const bonos = getBonos();
     const bono = bonos.find(b => b.numeroBono === numBono);
     if (!bono) return;
-    document.getElementById('modalBody').innerHTML = buildBonoHTML(bono);
+    document.getElementById('modalBody').innerHTML = buildBonoHTML(bono) + `
+        <div style="text-align:center; margin-top:15px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+            <button onclick="editarNumeroBono('${numBono}')" class="btn btn-warning" style="font-size:0.85rem;">✏️ Editar N° Bono</button>
+            <button onclick="closeModal()" class="btn btn-secondary" style="font-size:0.85rem;">Cerrar</button>
+        </div>`;
     document.getElementById('modalMain').classList.add('active');
 }
 
@@ -3455,6 +3470,10 @@ function renderBonos() {
             <td>${badge}</td>
             <td>
                 ${admin ? `
+                <button onclick="editarNumeroBono('${b.numeroBono}')"
+                        class="action-btn" style="background:#f59e0b; font-size:0.85rem; padding:6px 14px;">
+                    ✏️ N°
+                </button>
                 <button onclick="verBonoModal('${b.numeroBono}')"
                         class="action-btn" style="background:#8b5cf6;">
                     👁️
@@ -3677,6 +3696,7 @@ function loginAdmin() {
         renderAdminPending();
         renderBonos();
         renderSocios();
+        checkImportVisibility();
     } else {
         // Registrar intento fallido
         registrarIntentoFallido();
@@ -4044,6 +4064,11 @@ function editarSocioModal(numSocio) {
     document.getElementById('modalBody').innerHTML = `
         <h3 style="color:#1e40af; margin-bottom:15px;">✏️ Editar Socio N° ${numSocio}</h3>
         <div class="form-group">
+            <label>N° Socio (cambiar con cuidado, se actualizan automáticamente los bonos asociados)</label>
+            <input type="text" id="editNumSocioModal" value="${s.numeroSocio || ''}" placeholder="Ej: 0042" style="width:100%; padding:10px; border:2px solid #e5e7eb; border-radius:10px; font-size:1rem; background:#fffbeb;">
+            <p style="font-size:0.75rem; color:#d97706; margin-top:4px;">⚠️ Si cambiás el número, todos los bonos de este socio se actualizarán automáticamente. No puede ser un número ya existente.</p>
+        </div>
+        <div class="form-group">
             <label>Apellido y Nombre del Responsable</label>
             <input type="text" id="editRespModal" value="${s.nombreResp || ''}" style="text-transform:uppercase; width:100%; padding:10px; border:2px solid #e5e7eb; border-radius:10px; font-size:1rem;">
         </div>
@@ -4089,8 +4114,35 @@ function editarSocioModal(numSocio) {
 function guardarEdicionSocioModal(numSocio) {
     pedirClaveAdmin(() => {
         let socios = getSocios();
+        let bonos = getBonos();
         const idx = socios.findIndex(s => s.numeroSocio === numSocio);
         if (idx === -1) return;
+
+        const nuevoNumSocio = document.getElementById('editNumSocioModal').value.trim().padStart(4, '0');
+        const numeroOriginal = socios[idx].numeroSocio;
+
+        // Si cambió el número de socio
+        if (nuevoNumSocio && nuevoNumSocio !== numeroOriginal) {
+            // Verificar que no exista duplicado
+            if (socios.some(s => s.numeroSocio === nuevoNumSocio && s.numeroSocio !== numeroOriginal)) {
+                alert('❌ Ya existe un socio con el número ' + nuevoNumSocio + '. No se puede cambiar.');
+                return;
+            }
+            // Actualizar el socio
+            socios[idx].numeroSocio = nuevoNumSocio;
+            // Actualizar todos los bonos que referencian al número viejo
+            let countBonos = 0;
+            bonos.forEach(b => {
+                if (b.numeroSocio === numeroOriginal) {
+                    b.numeroSocio = nuevoNumSocio;
+                    countBonos++;
+                }
+            });
+            if (countBonos > 0) {
+                saveBonos(bonos);
+            }
+        }
+
         socios[idx].nombreResp   = document.getElementById('editRespModal').value.toUpperCase().trim();
         socios[idx].nombreAlumno = document.getElementById('editAlumModal').value.toUpperCase().trim();
         socios[idx].dni          = document.getElementById('editDniModal').value.trim();
@@ -4102,8 +4154,8 @@ function guardarEdicionSocioModal(numSocio) {
         socios[idx].fechaBaja    = baja || null;
         saveSocios(socios);
         renderSocios(); renderBonos();
-        verSocio(numSocio);
-        showAlertGlobal('✅ Socio actualizado', 'success');
+        verSocio(nuevoNumSocio || numeroOriginal);
+        showAlertGlobal('✅ Socio actualizado' + (nuevoNumSocio !== numeroOriginal ? ' (N° Socio cambiado a ' + nuevoNumSocio + ')' : ''), 'success');
     });
 }
 
@@ -4217,6 +4269,85 @@ function showAlertGlobal(msg, tipo = 'error') {
     setTimeout(() => div.remove(), 4000);
 }
 
+
+// ================================================
+// EDITAR NÚMERO DE BONO
+// ================================================
+function editarNumeroBono(numBono) {
+    const bonos = getBonos();
+    const bono = bonos.find(b => b.numeroBono === numBono);
+    if (!bono) return;
+    document.getElementById('modalBody').innerHTML = `
+        <h3 style="color:#1e40af; margin-bottom:15px;">✏️ Editar N° de Bono</h3>
+        <div class="form-group">
+            <label>N° Bono actual</label>
+            <input type="text" value="${bono.numeroBono}" disabled style="width:100%; padding:10px; border:2px solid #e5e7eb; border-radius:10px; background:#f3f4f6;">
+        </div>
+        <div class="form-group">
+            <label>Nuevo N° Bono</label>
+            <input type="text" id="nuevoNumBonoInput" value="${bono.numeroBono}" placeholder="Ej: 00042" style="width:100%; padding:10px; border:2px solid #e5e7eb; border-radius:10px; font-size:1rem;">
+            <p style="font-size:0.75rem; color:#d97706; margin-top:4px;">⚠️ No puede ser un número ya existente.</p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">
+            <button onclick="guardarNuevoNumeroBono('${numBono}')" class="btn btn-success">💾 Guardar</button>
+            <button onclick="verBonoModal('${numBono}')" class="btn btn-secondary">⬅️ Volver</button>
+        </div>
+    `;
+    document.getElementById('modalMain').classList.add('active');
+}
+
+function guardarNuevoNumeroBono(numBonoOriginal) {
+    const nuevo = document.getElementById('nuevoNumBonoInput').value.trim().padStart(5, '0');
+    if (!nuevo) {
+        showAlertGlobal('Ingresá un número de bono', 'error');
+        return;
+    }
+    if (nuevo === numBonoOriginal) {
+        verBonoModal(numBonoOriginal);
+        return;
+    }
+    const bonos = getBonos();
+    if (bonos.some(b => b.numeroBono === nuevo && b.numeroBono !== numBonoOriginal)) {
+        showAlertGlobal('❌ Ya existe un bono con el número ' + nuevo, 'error');
+        return;
+    }
+    const idx = bonos.findIndex(b => b.numeroBono === numBonoOriginal);
+    if (idx === -1) return;
+    bonos[idx].numeroBono = nuevo;
+    saveBonos(bonos);
+    
+    // Actualizar referencias en socios
+    const socios = getSocios();
+    let count = 0;
+    socios.forEach(s => {
+        if (s.bonos && s.bonos.includes(numBonoOriginal)) {
+            s.bonos = s.bonos.map(n => n === numBonoOriginal ? nuevo : n);
+            count++;
+        }
+    });
+    if (count > 0) saveSocios(socios);
+    
+    renderBonos();
+    renderSocios();
+    renderAdminPending();
+    verBonoModal(nuevo);
+    showAlertGlobal('✅ N° de bono cambiado a ' + nuevo, 'success');
+}
+
+// ================================================
+// MOSTRAR/OCULTAR IMPORTACIÓN SEGÚN ESTADO DE GOOGLE SHEETS
+// ================================================
+function checkImportVisibility() {
+    const url = getCloudUrl();
+    const msg = document.getElementById('importCloudMsg');
+    if (!msg) return;
+    if (url && url !== 'PONER_URL_AQUI' && url.startsWith('http')) {
+        msg.style.display = 'block';
+    } else {
+        msg.style.display = 'none';
+    }
+}
+
 // ================================================
 // ARRANCAR
 // ================================================
@@ -4231,6 +4362,5 @@ function showAlertGlobal(msg, tipo = 'error') {
         <div id="modalAdminBody"></div>
     </div>
 </div>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a081dd2439ec59a3',t:'MTc4MDg1ODQ1MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a08ba37ff806bc07',t:'MTc4MDk2MDk0Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
