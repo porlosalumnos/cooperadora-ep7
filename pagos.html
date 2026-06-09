@@ -1678,8 +1678,8 @@
         <h3 style="margin-bottom: 12px; font-size: 1.1rem;">📬 Cooperadora Escuela N° 7 Juan Bautista Alberdi</h3>
         <p style="opacity: 0.9; margin-bottom: 15px; font-size: 0.9rem;">Año Centenario 1926-2026 — Serrano N° 1326 — San Miguel, Bs. As.</p>
         <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; align-items: center;">
-            <a href="/cdn-cgi/l/email-protection#e3808c8c938693d4a3848e828a8fcd808c8e" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
-                📧 <span class="__cf_email__" data-cfemail="45262a2a35203572052228242c296b262a28">[email&#160;protected]</span>
+            <a href="/cdn-cgi/l/email-protection#583b3737283d286f183f35393134763b3735" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
+                📧 <span class="__cf_email__" data-cfemail="63000c0c1306135423040e020a0f4d000c0e">[email&#160;protected]</span>
             </a>
             <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5" target="_blank" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
                 📷 Instagram
@@ -1753,7 +1753,7 @@ let CFG = {
 // ================================================================
 // CONFIGURACIÓN DE LA NUBE (Google Sheets)
 // ================================================================
-const APPS_SCRIPT_URL = 'PONER_URL_AQUI';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfSFetQrSrgRFXAVE7TqkOblVnXdeH4yqvQTjxm6_gkw7_Kwdn6FSMzE5iG4rQMLtE/exec';
 const API_KEY_CLOUD = 'coop2026';
 
 // Cache en memoria (copia de trabajo)
@@ -1769,8 +1769,16 @@ function saveDB(key, data) {
     localStorage.setItem('coop_' + key, JSON.stringify(data));
 }
 
-function getSocios()  { return window._coopCache.socios || getDB('socios'); }
-function getBonos()   { return window._coopCache.bonos  || getDB('bonos'); }
+function getSocios() { return window._coopCache.socios || getDB('socios') || []; }
+function getBonos() {
+    let bonos = window._coopCache.bonos || getDB('bonos') || [];
+    // Normalizar datos que vienen rotos de Google Sheets
+    return bonos.map(b => ({
+        ...b,
+        estado: b.estado || 'pendiente',
+        conceptos: safeConceptos(b)
+    }));
+}
 function saveSocios(d){ window._coopCache.socios = d; saveDB('socios', d); syncToCloud({ socios: d }); }
 function saveBonos(d) { window._coopCache.bonos  = d; saveDB('bonos',  d); syncToCloud({ bonos: d });  }
 
@@ -2106,10 +2114,19 @@ async function init() {
     if (window.location.protocol === 'file:') {
         mostrarBannerFileProtocol();
     }
-    await syncFromCloud();
+    console.log('[INIT] Iniciando sistema...');
     loadConfig();
     renderDivisiones();
     renderMeses();
+    
+    // Intentar sincronizar desde la nube automáticamente
+    const cloudOk = await syncFromCloud();
+    if (!cloudOk) {
+        console.warn('[INIT] Sincronización desde nube falló o no configurada. Usando datos locales.');
+    } else {
+        console.log('[INIT] Datos sincronizados desde la nube correctamente.');
+    }
+    
     renderSocios();
     renderBonos();
     updateFiltroDivisiones();
@@ -3110,6 +3127,11 @@ function renderSocios() {
                 <span>Total abonado:</span>
                 <strong>$${totalConf.toLocaleString('es-AR')}</strong>
             </div>
+            ${isAdmin ? `
+            <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+                <button onclick="event.stopPropagation(); editarSocioModal('${s.numeroSocio}')" class="btn btn-warning" style="padding:5px 12px; font-size:0.75rem; border-radius:15px;">✏️ Editar</button>
+                <button onclick="event.stopPropagation(); verSocio('${s.numeroSocio}')" class="btn btn-info" style="padding:5px 12px; font-size:0.75rem; border-radius:15px;">👁️ Ver</button>
+            </div>` : ''}
         </div>`;
     }).join('');
 }
@@ -3291,15 +3313,20 @@ function eliminarSocio(numSocio) {
 // VER BONO EN MODAL
 // ================================================
 function verBonoModal(numBono) {
-    const bonos = getBonos();
-    const bono = bonos.find(b => b.numeroBono === numBono);
-    if (!bono) return;
-    document.getElementById('modalBody').innerHTML = buildBonoHTML(bono) + `
-        <div style="text-align:center; margin-top:15px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-            <button onclick="editarNumeroBono('${numBono}')" class="btn btn-warning" style="font-size:0.85rem;">✏️ Editar N° Bono</button>
-            <button onclick="closeModal()" class="btn btn-secondary" style="font-size:0.85rem;">Cerrar</button>
-        </div>`;
-    document.getElementById('modalMain').classList.add('active');
+    try {
+        const bonos = getBonos();
+        const bono = bonos.find(b => b.numeroBono === numBono);
+        if (!bono) { console.warn('verBonoModal: bono no encontrado', numBono); return; }
+        document.getElementById('modalBody').innerHTML = buildBonoHTML(bono) + `
+            <div style="text-align:center; margin-top:15px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button onclick="editarNumeroBono('${numBono}')" class="btn btn-warning" style="font-size:0.85rem;">✏️ Editar N° Bono</button>
+                <button onclick="closeModal()" class="btn btn-secondary" style="font-size:0.85rem;">Cerrar</button>
+            </div>`;
+        document.getElementById('modalMain').classList.add('active');
+    } catch (e) {
+        console.error('[verBonoModal] Error:', e);
+        alert('Error al abrir bono: ' + e.message);
+    }
 }
 
 function closeModal() {
@@ -3504,58 +3531,63 @@ function renderBonos() {
 }
 
 function toggleEstadoBono(numBono) {
+    console.log('[toggleEstadoBono] Llamado con:', numBono);
     pedirClaveAdmin(() => {
-    const bonos = getBonos();
-    const idx = bonos.findIndex(b => b.numeroBono === numBono);
-    if (idx >= 0) {
-        const anterior = bonos[idx].estado;
-        bonos[idx].estado = anterior === 'confirmado'
-                          ? 'pendiente'
-                          : 'confirmado';
-        // Si se confirma, registrar fecha
-            if (bonos[idx].estado === 'confirmado') {
-                bonos[idx].fechaConfirmacion =
-                    new Date().toLocaleDateString('es-AR');
-        }
-        saveBonos(bonos);
-        renderBonos();
-        renderSocios();
-        showAlertGlobal(
-                `✅ Bono ${numBono}: ${bonos[idx].estado}`,
-                'success'
-            );
+        try {
+            const bonos = getBonos();
+            const idx = bonos.findIndex(b => b.numeroBono === numBono);
+            if (idx >= 0) {
+                const anterior = bonos[idx].estado || 'pendiente';
+                bonos[idx].estado = anterior === 'confirmado' ? 'pendiente' : 'confirmado';
+                if (bonos[idx].estado === 'confirmado') {
+                    bonos[idx].fechaConfirmacion = new Date().toLocaleDateString('es-AR');
+                }
+                saveBonos(bonos);
+                renderBonos();
+                renderSocios();
+                showAlertGlobal(`✅ Bono ${numBono}: ${bonos[idx].estado}`, 'success');
+            } else {
+                console.warn('[toggleEstadoBono] Bono no encontrado:', numBono);
+                alert('Bono no encontrado: ' + numBono);
+            }
+        } catch (e) {
+            console.error('[toggleEstadoBono] Error:', e);
+            alert('Error al cambiar estado: ' + e.message);
         }
     });
 }
 
 function deleteBono(numBono) {
+    console.log('[deleteBono] Llamado con:', numBono);
     pedirClaveAdmin(() => {
         if (!confirm(`¿Eliminar definitivamente el bono N° ${numBono}?`)) return;
+        try {
+            let bonos = getBonos();
+            const bono = bonos.find(b => b.numeroBono === numBono);
+            bonos = bonos.filter(b => b.numeroBono !== numBono);
+            saveBonos(bonos);
 
-        let bonos = getBonos();
-        const bono = bonos.find(b => b.numeroBono === numBono);
-        bonos = bonos.filter(b => b.numeroBono !== numBono);
-        saveBonos(bonos);
-
-        if (bono) {
-            const socios = getSocios();
-            const idx = socios.findIndex(
-                s => s.numeroSocio === bono.numeroSocio
-            );
-            if (idx >= 0) {
-                socios[idx].bonos = (socios[idx].bonos || [])
-                    .filter(n => n !== numBono);
-                socios[idx].totalPagado = Math.max(0,
-                    (socios[idx].totalPagado || 0) - bono.total);
-                saveSocios(socios);
+            if (bono) {
+                const socios = getSocios();
+                const idx = socios.findIndex(
+                    s => s.numeroSocio === bono.numeroSocio
+                );
+                if (idx >= 0) {
+                    socios[idx].bonos = (socios[idx].bonos || [])
+                        .filter(n => n !== numBono);
+                    socios[idx].totalPagado = Math.max(0,
+                        (socios[idx].totalPagado || 0) - bono.total);
+                    saveSocios(socios);
+                }
             }
-        }
 
-        renderBonos();
-        renderSocios();
-        showAlertGlobal(
-            `🗑️ Bono ${numBono} eliminado`, 'info'
-        );
+            renderBonos();
+            renderSocios();
+            showAlertGlobal(`🗑️ Bono ${numBono} eliminado`, 'info');
+        } catch (e) {
+            console.error('[deleteBono] Error:', e);
+            alert('Error al eliminar: ' + e.message);
+        }
     });
 }
 // ================================================
@@ -4124,13 +4156,14 @@ function editarSocioModal(numSocio) {
 
 function guardarEdicionSocioModal(numSocio) {
     pedirClaveAdmin(() => {
-        let socios = getSocios();
-        let bonos = getBonos();
-        const idx = socios.findIndex(s => s.numeroSocio === numSocio);
-        if (idx === -1) return;
+        try {
+            let socios = getSocios();
+            let bonos = getBonos();
+            const idx = socios.findIndex(s => s.numeroSocio === numSocio);
+            if (idx === -1) { alert('Socio no encontrado'); return; }
 
-        const nuevoNumSocio = document.getElementById('editNumSocioModal').value.trim().padStart(4, '0');
-        const numeroOriginal = socios[idx].numeroSocio;
+            const nuevoNumSocio = document.getElementById('editNumSocioModal').value.trim().padStart(4, '0');
+            const numeroOriginal = socios[idx].numeroSocio;
 
         // Si cambió el número de socio
         if (nuevoNumSocio && nuevoNumSocio !== numeroOriginal) {
@@ -4164,9 +4197,13 @@ function guardarEdicionSocioModal(numSocio) {
         const baja = document.getElementById('editBajaModal').value.trim();
         socios[idx].fechaBaja    = baja || null;
         saveSocios(socios);
-        renderSocios(); renderBonos();
-        verSocio(nuevoNumSocio || numeroOriginal);
-        showAlertGlobal('✅ Socio actualizado' + (nuevoNumSocio !== numeroOriginal ? ' (N° Socio cambiado a ' + nuevoNumSocio + ')' : ''), 'success');
+            renderSocios(); renderBonos();
+            verSocio(nuevoNumSocio || numeroOriginal);
+            showAlertGlobal('✅ Socio actualizado' + (nuevoNumSocio !== numeroOriginal ? ' (N° Socio cambiado a ' + nuevoNumSocio + ')' : ''), 'success');
+        } catch (e) {
+            console.error('[guardarEdicionSocioModal] Error:', e);
+            alert('Error al guardar: ' + e.message);
+        }
     });
 }
 
@@ -4285,26 +4322,31 @@ function showAlertGlobal(msg, tipo = 'error') {
 // EDITAR NÚMERO DE BONO
 // ================================================
 function editarNumeroBono(numBono) {
-    const bonos = getBonos();
-    const bono = bonos.find(b => b.numeroBono === numBono);
-    if (!bono) return;
-    document.getElementById('modalBody').innerHTML = `
-        <h3 style="color:#1e40af; margin-bottom:15px;">✏️ Editar N° de Bono</h3>
-        <div class="form-group">
-            <label>N° Bono actual</label>
-            <input type="text" value="${bono.numeroBono}" disabled style="width:100%; padding:10px; border:2px solid #e5e7eb; border-radius:10px; background:#f3f4f6;">
-        </div>
-        <div class="form-group">
-            <label>Nuevo N° Bono</label>
-            <input type="text" id="nuevoNumBonoInput" value="${bono.numeroBono}" placeholder="Ej: 00042" style="width:100%; padding:10px; border:2px solid #e5e7eb; border-radius:10px; font-size:1rem;">
-            <p style="font-size:0.75rem; color:#d97706; margin-top:4px;">⚠️ No puede ser un número ya existente.</p>
-        </div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">
-            <button onclick="guardarNuevoNumeroBono('${numBono}')" class="btn btn-success">💾 Guardar</button>
-            <button onclick="verBonoModal('${numBono}')" class="btn btn-secondary">⬅️ Volver</button>
-        </div>
-    `;
-    document.getElementById('modalMain').classList.add('active');
+    try {
+        const bonos = getBonos();
+        const bono = bonos.find(b => b.numeroBono === numBono);
+        if (!bono) { console.warn('editarNumeroBono: bono no encontrado', numBono); return; }
+        document.getElementById('modalBody').innerHTML = `
+            <h3 style="color:#1e40af; margin-bottom:15px;">✏️ Editar N° de Bono</h3>
+            <div class="form-group">
+                <label>N° Bono actual</label>
+                <input type="text" value="${bono.numeroBono}" disabled style="width:100%; padding:10px; border:2px solid #e5e7eb; border-radius:10px; background:#f3f4f6;">
+            </div>
+            <div class="form-group">
+                <label>Nuevo N° Bono</label>
+                <input type="text" id="nuevoNumBonoInput" value="${bono.numeroBono}" placeholder="Ej: 00042" style="width:100%; padding:10px; border:2px solid #e5e7eb; border-radius:10px; font-size:1rem;">
+                <p style="font-size:0.75rem; color:#d97706; margin-top:4px;">⚠️ No puede ser un número ya existente.</p>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">
+                <button onclick="guardarNuevoNumeroBono('${numBono}')" class="btn btn-success">💾 Guardar</button>
+                <button onclick="verBonoModal('${numBono}')" class="btn btn-secondary">⬅️ Volver</button>
+            </div>
+        `;
+        document.getElementById('modalMain').classList.add('active');
+    } catch (e) {
+        console.error('[editarNumeroBono] Error:', e);
+        alert('Error al abrir editor: ' + e.message);
+    }
 }
 
 function guardarNuevoNumeroBono(numBonoOriginal) {
@@ -4374,5 +4416,5 @@ function checkImportVisibility() {
     </div>
 </div>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a08bfbe8bec38f28',t:'MTc4MDk2NDU2OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
