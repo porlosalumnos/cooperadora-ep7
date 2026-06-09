@@ -1678,8 +1678,8 @@
         <h3 style="margin-bottom: 12px; font-size: 1.1rem;">📬 Cooperadora Escuela N° 7 Juan Bautista Alberdi</h3>
         <p style="opacity: 0.9; margin-bottom: 15px; font-size: 0.9rem;">Año Centenario 1926-2026 — Serrano N° 1326 — San Miguel, Bs. As.</p>
         <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; align-items: center;">
-            <a href="/cdn-cgi/l/email-protection#583b3737283d286f183f35393134763b3735" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
-                📧 <span class="__cf_email__" data-cfemail="63000c0c1306135423040e020a0f4d000c0e">[email&#160;protected]</span>
+            <a href="/cdn-cgi/l/email-protection#b4d7dbdbc4d1c483f4d3d9d5ddd89ad7dbd9" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
+                📧 <span class="__cf_email__" data-cfemail="294a4646594c591e694e44484045074a4644">[email&#160;protected]</span>
             </a>
             <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5" target="_blank" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
                 📷 Instagram
@@ -1769,15 +1769,35 @@ function saveDB(key, data) {
     localStorage.setItem('coop_' + key, JSON.stringify(data));
 }
 
-function getSocios() { return window._coopCache.socios || getDB('socios') || []; }
+function getSocios() {
+    let socios = window._coopCache.socios || getDB('socios') || [];
+    return socios.map(s => {
+        let numSocio = s.numeroSocio;
+        if (typeof numSocio === 'number') numSocio = String(numSocio);
+        if (typeof numSocio === 'string') numSocio = numSocio.padStart(4, '0');
+        return { ...s, numeroSocio: numSocio };
+    });
+}
 function getBonos() {
     let bonos = window._coopCache.bonos || getDB('bonos') || [];
     // Normalizar datos que vienen rotos de Google Sheets
-    return bonos.map(b => ({
-        ...b,
-        estado: b.estado || 'pendiente',
-        conceptos: safeConceptos(b)
-    }));
+    return bonos.map(b => {
+        // Normalizar numeroBono: siempre string con padStart(5,'0')
+        let numBono = b.numeroBono;
+        if (typeof numBono === 'number') numBono = String(numBono);
+        if (typeof numBono === 'string') numBono = numBono.padStart(5, '0');
+        // Normalizar numeroSocio: siempre string con padStart(4,'0')
+        let numSocio = b.numeroSocio;
+        if (typeof numSocio === 'number') numSocio = String(numSocio);
+        if (typeof numSocio === 'string') numSocio = numSocio.padStart(4, '0');
+        return {
+            ...b,
+            numeroBono: numBono,
+            numeroSocio: numSocio,
+            estado: b.estado || 'pendiente',
+            conceptos: safeConceptos(b)
+        };
+    });
 }
 function saveSocios(d){ window._coopCache.socios = d; saveDB('socios', d); syncToCloud({ socios: d }); }
 function saveBonos(d) { window._coopCache.bonos  = d; saveDB('bonos',  d); syncToCloud({ bonos: d });  }
@@ -1871,16 +1891,27 @@ async function syncToCloud(payload) {
     if (!url || url === 'PONER_URL_AQUI') return false;
     try {
         const body = { action: 'write', apiKey: key, ...payload };
-        await fetch(url, {
+        console.log('[syncToCloud] Enviando POST a:', url);
+        const res = await fetch(url, {
             method: 'POST',
             redirect: 'follow',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(body)
         });
+        console.log('[syncToCloud] Status:', res.status, res.statusText);
+        if (!res.ok) {
+            console.warn('[syncToCloud] HTTP error:', res.status, res.statusText);
+            if (res.status === 405) {
+                showSyncStatus('⚠️ Error 405: El deploy no permite POST. Revisá en Google Apps Script que sea Web App con acceso "Anyone"');
+            } else {
+                showSyncStatus('⚠️ Guardado solo localmente (HTTP ' + res.status + ')');
+            }
+            return false;
+        }
         showSyncStatus('✅ Sincronizado');
         return true;
     } catch (e) {
-        console.warn('Sync write falló:', e);
+        console.warn('[syncToCloud] Error:', e);
         showSyncStatus('⚠️ Guardado solo localmente');
         return false;
     }
@@ -4415,6 +4446,6 @@ function checkImportVisibility() {
         <div id="modalAdminBody"></div>
     </div>
 </div>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a08c2dfb6d7294f8',t:'MTc4MDk2NjYxOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
