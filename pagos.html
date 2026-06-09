@@ -1557,7 +1557,7 @@
             <div class="form-row">
                 <div class="form-group" style="flex:2;">
                     <label>URL del Apps Script (Web App)</label>
-                    <input type="text" id="cfgCloudUrl" placeholder="https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec"
+                    <input type="text" id="cfgCloudUrl" placeholder="https://script.google.com/macros/s/AKfycbxIT8Xty4IOVs-yCnFnioMbEKdmQjJX5eu79ZSIepzZk4oRJN_xHL7HzrXKAxQytnXBxg/exec"
                            value="" style="font-size:0.85rem;">
                 </div>
                 <div class="form-group" style="flex:1;">
@@ -1573,7 +1573,7 @@
             </div>
             <p class="small" style="margin-top:10px; font-size:0.75rem; color:#94a3b8;">
                 Si dejás estos campos vacíos, el sistema usa la configuración por defecto del código. <br>
-                Si la URL está en <strong>https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec</strong>, todavía no está configurado.
+                Si la URL está en <strong>https://script.google.com/macros/s/AKfycbxIT8Xty4IOVs-yCnFnioMbEKdmQjJX5eu79ZSIepzZk4oRJN_xHL7HzrXKAxQytnXBxg/exec</strong>, todavía no está configurado.
             </p>
         </div>
 
@@ -1680,8 +1680,8 @@
         <h3 style="margin-bottom: 12px; font-size: 1.1rem;">📬 Cooperadora Escuela N° 7 Juan Bautista Alberdi</h3>
         <p style="opacity: 0.9; margin-bottom: 15px; font-size: 0.9rem;">Año Centenario 1926-2026 — Serrano N° 1326 — San Miguel, Bs. As.</p>
         <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; align-items: center;">
-            <a href="/cdn-cgi/l/email-protection#c6a5a9a9b6a3b6f186a1aba7afaae8a5a9ab" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
-                📧 <span class="__cf_email__" data-cfemail="e0838f8f908590d7a0878d81898cce838f8d">[email&#160;protected]</span>
+            <a href="/cdn-cgi/l/email-protection#cba8a4a4bbaebbfc8baca6aaa2a7e5a8a4a6" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
+                📧 <span class="__cf_email__" data-cfemail="660509091603165126010b070f0a4805090b">[email&#160;protected]</span>
             </a>
             <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5" target="_blank" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
                 📷 Instagram
@@ -1755,7 +1755,7 @@ let CFG = {
 // ================================================================
 // CONFIGURACIÓN DE LA NUBE (Google Sheets)
 // ================================================================
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIT8Xty4IOVs-yCnFnioMbEKdmQjJX5eu79ZSIepzZk4oRJN_xHL7HzrXKAxQytnXBxg/exec';
 const API_KEY_CLOUD = 'coop2026';
 
 // Cache en memoria (copia de trabajo)
@@ -1845,7 +1845,7 @@ async function syncFromCloud() {
     }
     const url = getCloudUrl();
     const key = getCloudKey();
-    if (!url || url === 'https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec') {
+    if (!url || url === 'https://script.google.com/macros/s/AKfycbxIT8Xty4IOVs-yCnFnioMbEKdmQjJX5eu79ZSIepzZk4oRJN_xHL7HzrXKAxQytnXBxg/exec') {
         console.warn('[syncFromCloud] URL no configurada:', url);
         return false;
     }
@@ -1890,7 +1890,7 @@ async function syncFromCloud() {
 async function syncToCloud(payload) {
     const url = getCloudUrl();
     const key = getCloudKey();
-    if (!url || url === 'https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec') return false;
+    if (!url || url === 'https://script.google.com/macros/s/AKfycbxIT8Xty4IOVs-yCnFnioMbEKdmQjJX5eu79ZSIepzZk4oRJN_xHL7HzrXKAxQytnXBxg/exec') return false;
     try {
         const body = { action: 'write', apiKey: key, ...payload };
         console.log('[syncToCloud] Enviando POST a:', url);
@@ -1951,8 +1951,8 @@ async function testCloudConnection() {
         return;
     }
 
-    if (!url || url === 'https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec' || url === '') {
-        alert('❌ No se pudo conectar.\n\nLa URL del Apps Script está vacía o dice https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec.\n\nSolución: Copiá la URL que te dio Google cuando hiciste Deploy > New deployment, y pegala en el campo "URL del Apps Script" del panel Admin.\n\nEjemplo de cómo se ve la URL:\nhttps://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec');
+    if (!url || url === 'https://script.google.com/macros/s/AKfycbxIT8Xty4IOVs-yCnFnioMbEKdmQjJX5eu79ZSIepzZk4oRJN_xHL7HzrXKAxQytnXBxg/exec' || url === '') {
+        alert('❌ No se pudo conectar.\n\nLa URL del Apps Script está vacía o dice https://script.google.com/macros/s/AKfycbxIT8Xty4IOVs-yCnFnioMbEKdmQjJX5eu79ZSIepzZk4oRJN_xHL7HzrXKAxQytnXBxg/exec.\n\nSolución: Copiá la URL que te dio Google cuando hiciste Deploy > New deployment, y pegala en el campo "URL del Apps Script" del panel Admin.\n\nEjemplo de cómo se ve la URL:\nhttps://script.google.com/macros/s/AKfycbxIT8Xty4IOVs-yCnFnioMbEKdmQjJX5eu79ZSIepzZk4oRJN_xHL7HzrXKAxQytnXBxg/exec');
         return;
     }
 
@@ -4449,7 +4449,7 @@ function checkImportVisibility() {
     const url = getCloudUrl();
     const msg = document.getElementById('importCloudMsg');
     if (!msg) return;
-    if (url && url !== 'https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec' && url.startsWith('http')) {
+    if (url && url !== 'https://script.google.com/macros/s/AKfycbxIT8Xty4IOVs-yCnFnioMbEKdmQjJX5eu79ZSIepzZk4oRJN_xHL7HzrXKAxQytnXBxg/exec' && url.startsWith('http')) {
         msg.style.display = 'block';
     } else {
         msg.style.display = 'none';
