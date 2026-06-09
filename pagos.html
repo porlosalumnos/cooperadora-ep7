@@ -1555,7 +1555,7 @@
             <div class="form-row">
                 <div class="form-group" style="flex:2;">
                     <label>URL del Apps Script (Web App)</label>
-                    <input type="text" id="cfgCloudUrl" placeholder="https://script.google.com/macros/s/.../exec"
+                    <input type="text" id="cfgCloudUrl" placeholder="https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec"
                            value="" style="font-size:0.85rem;">
                 </div>
                 <div class="form-group" style="flex:1;">
@@ -1571,7 +1571,7 @@
             </div>
             <p class="small" style="margin-top:10px; font-size:0.75rem; color:#94a3b8;">
                 Si dejás estos campos vacíos, el sistema usa la configuración por defecto del código. <br>
-                Si la URL está en <strong>PONER_URL_AQUI</strong>, todavía no está configurado.
+                Si la URL está en <strong>https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec</strong>, todavía no está configurado.
             </p>
         </div>
 
@@ -1678,8 +1678,8 @@
         <h3 style="margin-bottom: 12px; font-size: 1.1rem;">📬 Cooperadora Escuela N° 7 Juan Bautista Alberdi</h3>
         <p style="opacity: 0.9; margin-bottom: 15px; font-size: 0.9rem;">Año Centenario 1926-2026 — Serrano N° 1326 — San Miguel, Bs. As.</p>
         <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; align-items: center;">
-            <a href="/cdn-cgi/l/email-protection#b4d7dbdbc4d1c483f4d3d9d5ddd89ad7dbd9" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
-                📧 <span class="__cf_email__" data-cfemail="294a4646594c591e694e44484045074a4644">[email&#160;protected]</span>
+            <a href="/cdn-cgi/l/email-protection#573438382732276017303a363e3b7934383a" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
+                📧 <span class="__cf_email__" data-cfemail="fa9995958a9f8acdba9d979b9396d4999597">[email&#160;protected]</span>
             </a>
             <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5" target="_blank" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
                 📷 Instagram
@@ -1753,7 +1753,7 @@ let CFG = {
 // ================================================================
 // CONFIGURACIÓN DE LA NUBE (Google Sheets)
 // ================================================================
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfSFetQrSrgRFXAVE7TqkOblVnXdeH4yqvQTjxm6_gkw7_Kwdn6FSMzE5iG4rQMLtE/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec';
 const API_KEY_CLOUD = 'coop2026';
 
 // Cache en memoria (copia de trabajo)
@@ -1843,7 +1843,7 @@ async function syncFromCloud() {
     }
     const url = getCloudUrl();
     const key = getCloudKey();
-    if (!url || url === 'PONER_URL_AQUI') {
+    if (!url || url === 'https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec') {
         console.warn('[syncFromCloud] URL no configurada:', url);
         return false;
     }
@@ -1888,7 +1888,7 @@ async function syncFromCloud() {
 async function syncToCloud(payload) {
     const url = getCloudUrl();
     const key = getCloudKey();
-    if (!url || url === 'PONER_URL_AQUI') return false;
+    if (!url || url === 'https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec') return false;
     try {
         const body = { action: 'write', apiKey: key, ...payload };
         console.log('[syncToCloud] Enviando POST a:', url);
@@ -1949,8 +1949,8 @@ async function testCloudConnection() {
         return;
     }
 
-    if (!url || url === 'PONER_URL_AQUI' || url === '') {
-        alert('❌ No se pudo conectar.\n\nLa URL del Apps Script está vacía o dice PONER_URL_AQUI.\n\nSolución: Copiá la URL que te dio Google cuando hiciste Deploy > New deployment, y pegala en el campo "URL del Apps Script" del panel Admin.\n\nEjemplo de cómo se ve la URL:\nhttps://script.google.com/macros/s/ABC123/exec');
+    if (!url || url === 'https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec' || url === '') {
+        alert('❌ No se pudo conectar.\n\nLa URL del Apps Script está vacía o dice https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec.\n\nSolución: Copiá la URL que te dio Google cuando hiciste Deploy > New deployment, y pegala en el campo "URL del Apps Script" del panel Admin.\n\nEjemplo de cómo se ve la URL:\nhttps://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec');
         return;
     }
 
@@ -4425,7 +4425,7 @@ function checkImportVisibility() {
     const url = getCloudUrl();
     const msg = document.getElementById('importCloudMsg');
     if (!msg) return;
-    if (url && url !== 'PONER_URL_AQUI' && url.startsWith('http')) {
+    if (url && url !== 'https://script.google.com/macros/s/AKfycbyM5sGuIh5fFjqH1laRvI9rcxdcruahWjE3bywppEyGQLGdxUFfiej1SwNrgU5gypGaNA/exec' && url.startsWith('http')) {
         msg.style.display = 'block';
     } else {
         msg.style.display = 'none';
@@ -4446,6 +4446,6 @@ function checkImportVisibility() {
         <div id="modalAdminBody"></div>
     </div>
 </div>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a08c2dfb6d7294f8',t:'MTc4MDk2NjYxOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
