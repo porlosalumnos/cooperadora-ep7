@@ -1100,7 +1100,6 @@
         <a onclick="showTab('socios', this)">👥 Socios</a>
         <a onclick="showTab('bonos', this)">📄 Bonos</a>
         <a onclick="showTab('admin', this)">📊 Admin</a>
-        <a href="libro-socios.html" target="_blank" style="background:#1e40af; color:white; font-weight:bold;">📖 Libro Socios</a>
     </nav>
 </header>
 
@@ -1422,9 +1421,6 @@
             <button class="btn btn-success" onclick="exportSociosCSV()">
                 📥 Exportar Socios (CSV)
             </button>
-            <a href="libro-socios.html" target="_blank" class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center;">
-                📖 Libro de Socios Oficial (Excel + Editar Alta/Baja)
-            </a>
         </div>
 
         <div id="adminStatsS" class="admin-stats"></div>
@@ -1503,8 +1499,16 @@
     </div>
 
     <div id="adminContent" class="hidden">
-        <div style="display:flex; justify-content:flex-end;
+        <div style="display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;
      margin-bottom:15px;">
+    <button onclick="pedirClaveAdmin(() => window.open('libro-socios.html', '_blank'))"
+            class="btn btn-primary"
+            style="background:#1e40af; color:white;
+            padding:10px 20px; border:none;
+            border-radius:20px; cursor:pointer;
+            font-weight:bold; font-size:0.9rem;">
+        📖 Libro de Socios (Protegido)
+    </button>
     <button onclick="logoutAdmin()"
             style="background:#ef4444; color:white;
             padding:10px 20px; border:none;
@@ -1680,8 +1684,8 @@
         <h3 style="margin-bottom: 12px; font-size: 1.1rem;">📬 Cooperadora Escuela N° 7 Juan Bautista Alberdi</h3>
         <p style="opacity: 0.9; margin-bottom: 15px; font-size: 0.9rem;">Año Centenario 1926-2026 — Serrano N° 1326 — San Miguel, Bs. As.</p>
         <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; align-items: center;">
-            <a href="/cdn-cgi/l/email-protection#c0a3afafb0a5b0f780a7ada1a9aceea3afad" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
-                📧 <span class="__cf_email__" data-cfemail="51323e3e2134216611363c30383d7f323e3c">[email&#160;protected]</span>
+            <a href="/cdn-cgi/l/email-protection#90f3ffffe0f5e0a7d0f7fdf1f9fcbef3fffd" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
+                📧 <span class="__cf_email__" data-cfemail="20434f4f5045501760474d41494c0e434f4d">[email&#160;protected]</span>
             </a>
             <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5" target="_blank" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
                 📷 Instagram
@@ -3184,7 +3188,7 @@ function renderSocios() {
             </div>
             ${isAdmin ? `
             <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
-                <button onclick="event.stopPropagation(); editarSocioModal('${s.numeroSocio}')" class="btn btn-warning" style="padding:5px 12px; font-size:0.75rem; border-radius:15px;">✏️ Editar</button>
+                <button onclick="event.stopPropagation(); pedirClaveAdmin(() => editarSocioModal('${s.numeroSocio}'))" class="btn btn-warning" style="padding:5px 12px; font-size:0.75rem; border-radius:15px;">✏️ Editar</button>
                 <button onclick="event.stopPropagation(); verSocio('${s.numeroSocio}')" class="btn btn-info" style="padding:5px 12px; font-size:0.75rem; border-radius:15px;">👁️ Ver</button>
             </div>` : ''}
         </div>`;
@@ -3304,11 +3308,11 @@ function verSocio(numSocio) {
                     class="btn btn-primary">
                 ➕ Nuevo Pago para este Socio
             </button>
-            <button onclick="editarSocioModal('${numSocio}')"
+            <button onclick="pedirClaveAdmin(() => editarSocioModal('${numSocio}'))"
                     class="btn btn-warning">
                 ✏️ Editar Socio
             </button>
-            <button onclick="eliminarSocio('${numSocio}')"
+            <button onclick="pedirClaveAdmin(() => eliminarSocio('${numSocio}'))"
                     class="btn btn-danger">
                 🗑️ Eliminar Socio
             </button>
@@ -4471,5 +4475,5 @@ function checkImportVisibility() {
     </div>
 </div>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a08c87721d979b23',t:'MTc4MDk3MDI4Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
