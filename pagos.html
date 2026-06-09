@@ -1190,9 +1190,11 @@
                        placeholder="Ej: 3541-123456">
             </div>
             <div class="form-group">
-                <label>DNI del Responsable</label>
+                <label>DNI del Responsable <span class="required">*</span></label>
                 <input type="text" id="fDni"
-                       placeholder="Ej: 45.123.456">
+                       placeholder="Ej: 45.123.456"
+                       oninput="this.value=this.value.replace(/[^0-9.]/g,'')">
+                <p style="font-size:0.75rem; color:#d97706; margin-top:4px;">⚠️ El DNI es obligatorio para evitar duplicados. Sin DNI no podemos verificar si ya sos socio.</p>
             </div>
         </div>
 
@@ -1678,8 +1680,8 @@
         <h3 style="margin-bottom: 12px; font-size: 1.1rem;">📬 Cooperadora Escuela N° 7 Juan Bautista Alberdi</h3>
         <p style="opacity: 0.9; margin-bottom: 15px; font-size: 0.9rem;">Año Centenario 1926-2026 — Serrano N° 1326 — San Miguel, Bs. As.</p>
         <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; align-items: center;">
-            <a href="/cdn-cgi/l/email-protection#573438382732276017303a363e3b7934383a" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
-                📧 <span class="__cf_email__" data-cfemail="fa9995958a9f8acdba9d979b9396d4999597">[email&#160;protected]</span>
+            <a href="/cdn-cgi/l/email-protection#c6a5a9a9b6a3b6f186a1aba7afaae8a5a9ab" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
+                📧 <span class="__cf_email__" data-cfemail="e0838f8f908590d7a0878d81898cce838f8d">[email&#160;protected]</span>
             </a>
             <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5" target="_blank" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
                 📷 Instagram
@@ -2055,14 +2057,18 @@ function getNextSocioNum() {
 }
 
 // Buscar socio existente por DNI o por nombre + alumno (para evitar duplicados)
-function findExistingSocio({ dni, nombreResp, nombreAlumno, telefono }) {
+function findExistingSocio({ dni, nombreResp, nombreAlumno }) {
     const socios = getSocios();
     const norm = (str) => (str || '').toUpperCase().trim().replace(/\s+/g, ' ');
 
-    // Prioridad 1: por DNI (si está cargado)
+    // Prioridad 1: por DNI (muy estricto - evita duplicados)
     if (dni && dni.trim() !== '') {
-        const byDni = socios.find(s => (s.dni || '').trim() === dni.trim());
-        if (byDni) return byDni;
+        const dniClean = dni.trim().replace(/[\.\s]/g, '');
+        const byDni = socios.find(s => {
+            const sDni = (s.dni || '').trim().replace(/[\.\s]/g, '');
+            return sDni === dniClean && sDni !== '';
+        });
+        if (byDni) return { socio: byDni, matchType: 'DNI' };
     }
 
     // Prioridad 2: por nombre responsable + alumno (normalizado)
@@ -2072,13 +2078,13 @@ function findExistingSocio({ dni, nombreResp, nombreAlumno, telefono }) {
         const byNames = socios.find(s =>
             norm(s.nombreResp) === resp && norm(s.nombreAlumno) === alum
         );
-        if (byNames) return byNames;
+        if (byNames) return { socio: byNames, matchType: 'nombre' };
     }
 
-    // Prioridad 3: solo por nombre del responsable (último recurso)
+    // Prioridad 3: solo por nombre del responsable (menos confiable)
     if (resp) {
         const byResp = socios.find(s => norm(s.nombreResp) === resp);
-        if (byResp) return byResp;
+        if (byResp) return { socio: byResp, matchType: 'nombre-parcial' };
     }
 
     return null;
@@ -2326,24 +2332,33 @@ function renderResultados(results) {
     if (results.length === 0) {
         container.innerHTML = `
             <div class="alert alert-info">
-                No se encontraron socios. Si es tu primer pago,
-                hacé clic en "Soy nuevo".
+                No se encontraron socios con ese nombre o DNI. Verificá que esté bien escrito.
+                <br><br>
+                <strong>¿Es tu primer pago?</strong> Hacé clic en "Soy nuevo" abajo.
             </div>`;
         return;
     }
     container.innerHTML = results.map(s => {
         const bonos = getBonos().filter(b => b.numeroSocio === s.numeroSocio);
+        const totalPagado = bonos.reduce((sum, b) => sum + b.total, 0);
+        const cuotasPagadas = getMesesPagados(s.numeroSocio, PAY.año || CFG.añoActual || 2026);
         return `
         <div class="socio-result" onclick="seleccionarSocio('${s.numeroSocio}')">
             <div class="socio-result-header">
                 <span class="num">Socio N° ${s.numeroSocio}</span>
-                <span class="pagos-count">${bonos.length} pago(s)</span>
+                <span class="pagos-count">${bonos.length} pago(s) — $${totalPagado.toLocaleString('es-AR')}</span>
             </div>
             <strong>${s.nombreResp}</strong><br>
             <span style="font-size:0.85rem; color:#6b7280;">
                 Alumno: ${s.nombreAlumno} — ${s.division || 'Sin división'}
                 ${s.dni ? ` — DNI: ${s.dni}` : ''}
             </span>
+            ${cuotasPagadas.length > 0 ? `
+            <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #e5e7eb;">
+                <span style="font-size:0.75rem; color:#059669; font-weight:bold;">
+                    ✅ Cuotas ya pagadas este año: ${cuotasPagadas.join(', ')}
+                </span>
+            </div>` : ''}
         </div>`;
     }).join('');
 }
@@ -2428,10 +2443,17 @@ function goStep(n, esNuevoPaso) {
         const alum = document.getElementById('fNombreAlumno').value.trim();
         const tel = document.getElementById('fTelefono').value.trim();
 
-        const existente = findExistingSocio({ dni, nombreResp: resp, nombreAlumno: alum, telefono: tel });
+        const existente = findExistingSocio({ dni, nombreResp: resp, nombreAlumno: alum });
         if (existente) {
-            if (confirm(`⚠️ Ya existe un socio similar:\n\nN° ${existente.numeroSocio} - ${existente.nombreResp}\nAlumno: ${existente.nombreAlumno}\n\n¿Querés usar ese socio existente en vez de crear uno nuevo?`)) {
-                seleccionarSocio(existente.numeroSocio);
+            const s = existente.socio;
+            let msg = `⚠️ Ya existe un socio registrado con los mismos datos:\n\n`;
+            msg += `N° ${s.numeroSocio} — ${s.nombreResp}\n`;
+            msg += `Alumno: ${s.nombreAlumno}\n`;
+            if (s.dni) msg += `DNI: ${s.dni}\n`;
+            msg += `\nCoincidencia por: ${existente.matchType.toUpperCase()}\n\n`;
+            msg += `¿Querés usar ese socio existente?`;
+            if (confirm(msg)) {
+                seleccionarSocio(s.numeroSocio);
                 return; // No continuar con el paso
             }
         }
@@ -2528,11 +2550,13 @@ function validateStep2() {
     const r = document.getElementById('fNombreResp').value.trim();
     const a = document.getElementById('fNombreAlumno').value.trim();
     const d = document.getElementById('fDomicilio').value.trim();
+    const dni = document.getElementById('fDni').value.trim();
 
     let err = [];
     if (!r) err.push('Apellido y Nombre del Responsable');
     if (!a) err.push('Nombre del Alumno/a o Responsable');
     if (!d) err.push('Domicilio');
+    if (!dni) err.push('DNI del Responsable (obligatorio para evitar duplicados)');
 
     if (err.length) { showAlert('Completá: ' + err.join(', ')); return false; }
     return true;
@@ -2812,10 +2836,10 @@ function generarBono() {
         const alum = document.getElementById('fNombreAlumno').value.trim();
         const tel = document.getElementById('fTelefono').value.trim();
 
-        const existente = findExistingSocio({ dni, nombreResp: resp, nombreAlumno: alum, telefono: tel });
+        const existente = findExistingSocio({ dni, nombreResp: resp, nombreAlumno: alum });
         if (existente) {
             // Usar el existente en vez de crear duplicado
-            socio = existente;
+            socio = existente.socio;
             const socios = getSocios();
             const idx = socios.findIndex(s => s.numeroSocio === socio.numeroSocio);
             if (idx >= 0) {
