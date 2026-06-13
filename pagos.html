@@ -1000,9 +1000,32 @@
         @media print {
             .header, .tabs, .buttons-row, .no-print,
             .whatsapp-float, .steps-indicator, .bank-info,
-            .modal-close { display: none !important; }
-            .bono-container { border: 2px solid #000; }
-            body { background: white; }
+            .modal-close, .alert, .search-bar, .socio-search,
+            .menu-toggle, .nav, .form-card, .resumen-box,
+            .donacion-montos, .meses-grid, .division-select,
+            .concepto-item, .steps-indicator { display: none !important; }
+            .bono-container { 
+                border: 2px solid #000; 
+                max-width: 100%; 
+                margin: 0; 
+                page-break-inside: avoid;
+                font-size: 11pt;
+                box-shadow: none;
+            }
+            .bono-header { padding: 8px 12px; font-size: 10pt; }
+            .bono-header h2 { font-size: 12pt; }
+            .bono-field { padding: 3px 0; font-size: 10pt; }
+            .bono-body { padding: 8px 12px; }
+            .bono-c-header { padding: 4px 8px; font-size: 9pt; }
+            .bono-c-row { padding: 3px 8px; font-size: 9pt; }
+            .bono-footer { padding: 6px 10px; font-size: 9pt; }
+            .bono-numero { padding: 6px; font-size: 14pt; }
+            .bono-socio-num { padding: 6px; font-size: 12pt; }
+            body { background: white; margin: 0; padding: 0; }
+            .main-container { margin: 0; padding: 0; max-width: 100%; }
+            .modal-content { padding: 0; border: none; box-shadow: none; }
+            .modal-overlay { position: static; background: white; }
+            @page { size: A4; margin: 10mm; }
         }
 
         /* ============ RESPONSIVE ============ */
@@ -1684,8 +1707,8 @@
         <h3 style="margin-bottom: 12px; font-size: 1.1rem;">📬 Cooperadora Escuela N° 7 Juan Bautista Alberdi</h3>
         <p style="opacity: 0.9; margin-bottom: 15px; font-size: 0.9rem;">Año Centenario 1926-2026 — Serrano N° 1326 — San Miguel, Bs. As.</p>
         <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; align-items: center;">
-            <a href="/cdn-cgi/l/email-protection#55363a3a25302562153238343c397b363a38" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
-                📧 <span class="__cf_email__" data-cfemail="43202c2c3326337403242e222a2f6d202c2e">[email&#160;protected]</span>
+            <a href="/cdn-cgi/l/email-protection#9af9f5f5eaffeaaddafdf7fbf3f6b4f9f5f7" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
+                📧 <span class="__cf_email__" data-cfemail="02616d6d7267723542656f636b6e2c616d6f">[email&#160;protected]</span>
             </a>
             <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5" target="_blank" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
                 📷 Instagram

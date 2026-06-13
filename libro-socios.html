@@ -613,13 +613,17 @@ function exportExcelCompleto() {
     const wsSocios = XLSX.utils.json_to_sheet(sociosData);
     XLSX.utils.book_append_sheet(wb, wsSocios, "Registro de Socios");
 
-    // === HOJA 2: LIBRO DIARIO DE INGRESOS ===
-    const diarioData = bonos
+    // === HOJA 2: LIBRO DIARIO DE INGRESOS (formato para pasar al libro contable) ===
+    let asientoNum = 1;
+    const diarioData = [];
+    
+    bonos
         .sort((a, b) => new Date(a.fechaISO) - new Date(b.fechaISO))
-        .map(b => {
-            const conceptos = safeConceptos(b).map(c => `${c.concepto} ($${c.monto})`).join(' | ');
-            return {
-                "Año": b.año || 2025,
+        .forEach((b, idx) => {
+            const conceptos = safeConceptos(b);
+            // Fila principal del ingreso
+            diarioData.push({
+                "Nº Asiento": asientoNum,
                 "Fecha": b.fecha,
                 "Hora": b.hora || '',
                 "Nº Bono": b.numeroBono,
@@ -627,16 +631,83 @@ function exportExcelCompleto() {
                 "Responsable": b.responsable,
                 "Alumno/a": b.alumno,
                 "División": b.division,
-                "Conceptos / Detalle": conceptos,
+                "Concepto": conceptos.map(c => c.concepto).join(' + '),
+                "Detalle": conceptos.map(c => `${c.concepto}: $${c.monto.toLocaleString('es-AR')}`).join(' | '),
                 "Monto Total ($)": b.total,
+                "Forma de Pago": "Transferencia",
+                "Estado": b.estado || 'confirmado',
                 "Domicilio": b.domicilio || ''
-            };
+            });
+            asientoNum++;
         });
 
     const wsDiario = XLSX.utils.json_to_sheet(diarioData);
+    
+    // Ajustar anchos de columnas para impresión
+    const wscols = [
+        {wch: 8},   // Nº Asiento
+        {wch: 12},  // Fecha
+        {wch: 10},  // Hora
+        {wch: 10},  // Nº Bono
+        {wch: 10},  // Nº Socio
+        {wch: 25},  // Responsable
+        {wch: 20},  // Alumno/a
+        {wch: 8},   // División
+        {wch: 30},  // Concepto
+        {wch: 35},  // Detalle
+        {wch: 14},  // Monto Total
+        {wch: 12},  // Forma de Pago
+        {wch: 10},  // Estado
+        {wch: 20}   // Domicilio
+    ];
+    wsDiario['!cols'] = wscols;
+    
     XLSX.utils.book_append_sheet(wb, wsDiario, "Libro Diario Ingresos");
 
-    // === HOJA 3: RESUMEN (útil) ===
+    // === HOJA 3: LIBRO DIARIO CONTABLE (detalle por concepto para registro oficial) ===
+    let lineaNum = 1;
+    const contableData = [];
+    
+    bonos
+        .sort((a, b) => new Date(a.fechaISO) - new Date(b.fechaISO))
+        .forEach(b => {
+            const conceptos = safeConceptos(b);
+            conceptos.forEach(c => {
+                contableData.push({
+                    "Nº Línea": lineaNum,
+                    "Fecha": b.fecha,
+                    "Nº Bono": b.numeroBono,
+                    "Nº Socio": b.numeroSocio,
+                    "Responsable": b.responsable,
+                    "Concepto": c.concepto,
+                    "Tipo": c.tipo || 'Otro',
+                    "Monto ($)": c.monto,
+                    "Forma de Pago": "Transferencia",
+                    "Estado": b.estado || 'confirmado',
+                    "Observaciones": `Bono ${b.numeroBono} - Alumno: ${b.alumno}`
+                });
+                lineaNum++;
+            });
+        });
+
+    const wsContable = XLSX.utils.json_to_sheet(contableData);
+    const contableCols = [
+        {wch: 8},   // Nº Línea
+        {wch: 12},  // Fecha
+        {wch: 10},  // Nº Bono
+        {wch: 10},  // Nº Socio
+        {wch: 25},  // Responsable
+        {wch: 25},  // Concepto
+        {wch: 12},  // Tipo
+        {wch: 12},  // Monto
+        {wch: 14},  // Forma de Pago
+        {wch: 10},  // Estado
+        {wch: 30}   // Observaciones
+    ];
+    wsContable['!cols'] = contableCols;
+    XLSX.utils.book_append_sheet(wb, wsContable, "Libro Diario Contable");
+
+    // === HOJA 4: RESUMEN (útil) ===
     const totalIngresos = bonos.reduce((s, b) => s + b.total, 0);
     const resumen = [
         { Concepto: "Total Socios Registrados", Valor: socios.length },
@@ -653,7 +724,7 @@ function exportExcelCompleto() {
     const nombre = `Libro_Socios_Cooperadora_${new Date().toISOString().slice(0,10)}.xlsx`;
     XLSX.writeFile(wb, nombre);
 
-    alert('✅ Excel exportado correctamente.\n\nHojas incluidas:\n• Registro de Socios\n• Libro Diario de Ingresos\n• Resumen');
+    alert('✅ Excel exportado correctamente.\n\nHojas incluidas:\n• Registro de Socios\n• Libro Diario Ingresos (por bono)\n• Libro Diario Contable (por concepto)\n• Resumen');
 }
 
 // ================================================
@@ -747,7 +818,7 @@ init();
     <p><strong>Cooperadora Escuela N° 7 Juan Bautista Alberdi</strong></p>
     <p>Serrano N° 1326 — San Miguel — Buenos Aires</p>
     <p style="margin-top:8px;">
-        <a href="/cdn-cgi/l/email-protection#41222e2e3124317601262c20282d6f222e2c" style="color:#60a5fa; text-decoration:none;"><span class="__cf_email__" data-cfemail="563539392633266116313b373f3a7835393b">[email&#160;protected]</span></a> ·
+        <a href="/cdn-cgi/l/email-protection#076468687762773047606a666e6b2964686a" style="color:#60a5fa; text-decoration:none;"><span class="__cf_email__" data-cfemail="c8aba7a7b8adb8ff88afa5a9a1a4e6aba7a5">[email&#160;protected]</span></a> ·
         <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5" target="_blank" style="color:#60a5fa; text-decoration:none;">Instagram</a> ·
         <a href="https://www.facebook.com/share/1E58Lrkmvx/" target="_blank" style="color:#60a5fa; text-decoration:none;">Facebook</a> ·
         <a href="https://wa.me/5491178244846" target="_blank" style="color:#60a5fa; text-decoration:none;">WhatsApp +54 9 11 7824-4846</a>
