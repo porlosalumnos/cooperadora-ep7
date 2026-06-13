@@ -1707,8 +1707,8 @@
         <h3 style="margin-bottom: 12px; font-size: 1.1rem;">📬 Cooperadora Escuela N° 7 Juan Bautista Alberdi</h3>
         <p style="opacity: 0.9; margin-bottom: 15px; font-size: 0.9rem;">Año Centenario 1926-2026 — Serrano N° 1326 — San Miguel, Bs. As.</p>
         <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; align-items: center;">
-            <a href="/cdn-cgi/l/email-protection#9af9f5f5eaffeaaddafdf7fbf3f6b4f9f5f7" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
-                📧 <span class="__cf_email__" data-cfemail="02616d6d7267723542656f636b6e2c616d6f">[email&#160;protected]</span>
+            <a href="/cdn-cgi/l/email-protection#0b6864647b6e7b3c4b6c666a626725686466" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
+                📧 <span class="__cf_email__" data-cfemail="b1d2dedec1d4c186f1d6dcd0d8dd9fd2dedc">[email&#160;protected]</span>
             </a>
             <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5" target="_blank" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
                 📷 Instagram
@@ -3084,7 +3084,41 @@ function enviarWAGeneral() {
 // ================================================
 // IMPRIMIR / DESCARGAR
 // ================================================
-function imprimirBono() { window.print(); }
+function imprimirBono() {
+    const bono = PAY.bonoActual;
+    if (!bono) return;
+    const htmlBono = buildBonoHTML(bono);
+    const win = window.open('', '_blank', 'width=700,height=600');
+    if (!win) { alert('Permití ventanas emergentes para imprimir el bono'); return; }
+    win.document.write(`
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bono N° ${bono.numeroBono}</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 0; padding: 10mm; background: white; }
+.bono-container { border: 2px solid #000; max-width: 100%; margin: 0 auto; }
+.bono-header { background: #1e40af; color: white; padding: 10px 15px; text-align: center; }
+.bono-header h2 { font-size: 14pt; margin: 0; }
+.bono-header p { font-size: 10pt; margin: 4px 0 0; }
+.bono-numero-row { display: grid; grid-template-columns: 1fr 1fr; }
+.bono-numero { background: #fbbf24; color: #1e3a5f; text-align: center; padding: 8px; font-size: 14pt; font-weight: bold; }
+.bono-socio-num { background: #1e40af; color: #fbbf24; text-align: center; padding: 8px; font-size: 12pt; font-weight: bold; }
+.bono-body { padding: 10px 15px; font-size: 10pt; }
+.bono-field { display: flex; border-bottom: 1px solid #ccc; padding: 3px 0; }
+.bono-field .blabel { font-weight: bold; color: #1e40af; min-width: 140px; font-size: 9pt; }
+.bono-field .bvalue { font-size: 9pt; }
+.bono-conceptos { margin-top: 8px; border: 2px solid #ccc; border-radius: 6px; overflow: hidden; }
+.bono-c-header { background: #1e40af; color: white; padding: 5px 10px; font-weight: bold; font-size: 9pt; display: grid; grid-template-columns: 1fr auto; }
+.bono-c-row { display: grid; grid-template-columns: 1fr auto; padding: 4px 10px; border-bottom: 1px solid #eee; font-size: 9pt; }
+.bono-c-row:last-child { border-bottom: none; }
+.bono-c-row.total { background: #eff6ff; font-weight: bold; color: #1e40af; border-top: 2px solid #1e40af; }
+.bono-footer { background: #f9fafb; padding: 10px 15px; text-align: center; border-top: 2px dashed #ccc; }
+.bono-estado { display: inline-block; padding: 4px 14px; border-radius: 15px; font-weight: bold; font-size: 9pt; margin-top: 4px; }
+.estado-pendiente { background: #fef3c7; color: #d97706; border: 2px solid #f59e0b; }
+.estado-confirmado { background: #d1fae5; color: #059669; border: 2px solid #10b981; }
+@media print { body { padding: 0; } .bono-container { border: 2px solid #000; } }
+</style></head><body>${htmlBono}</body></html>`);
+    win.document.close();
+    setTimeout(() => { win.print(); }, 300);
+}
 
 function descargarTxt() {
     const bono = PAY.bonoActual;
@@ -4514,6 +4548,6 @@ function checkImportVisibility() {
         <div id="modalAdminBody"></div>
     </div>
 </div>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0b2d52608c1c816',t:'MTc4MTM3MTkyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
