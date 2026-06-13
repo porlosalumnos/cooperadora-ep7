@@ -1684,8 +1684,8 @@
         <h3 style="margin-bottom: 12px; font-size: 1.1rem;">📬 Cooperadora Escuela N° 7 Juan Bautista Alberdi</h3>
         <p style="opacity: 0.9; margin-bottom: 15px; font-size: 0.9rem;">Año Centenario 1926-2026 — Serrano N° 1326 — San Miguel, Bs. As.</p>
         <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; align-items: center;">
-            <a href="/cdn-cgi/l/email-protection#6d0e02021d081d5a2d0a000c0401430e0200" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
-                📧 <span class="__cf_email__" data-cfemail="15767a7a65706522557278747c793b767a78">[email&#160;protected]</span>
+            <a href="/cdn-cgi/l/email-protection#55363a3a25302562153238343c397b363a38" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
+                📧 <span class="__cf_email__" data-cfemail="43202c2c3326337403242e222a2f6d202c2e">[email&#160;protected]</span>
             </a>
             <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5" target="_blank" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
                 📷 Instagram
@@ -1788,7 +1788,11 @@ function getSocios() {
             try { bonos = JSON.parse(bonos); } catch(e) { bonos = []; }
         }
         if (!Array.isArray(bonos)) bonos = [];
-        return { ...s, numeroSocio: numSocio, bonos: bonos };
+        // Normalizar dni: siempre string para evitar errores de .trim() o .includes()
+        let dni = s.dni;
+        if (dni !== undefined && dni !== null) dni = String(dni).trim();
+        else dni = '';
+        return { ...s, numeroSocio: numSocio, bonos: bonos, dni: dni };
     });
 }
 function getBonos() {
@@ -1803,10 +1807,15 @@ function getBonos() {
         let numSocio = b.numeroSocio;
         if (typeof numSocio === 'number') numSocio = String(numSocio);
         if (typeof numSocio === 'string') numSocio = numSocio.padStart(4, '0');
+        // Normalizar dni: siempre string
+        let dni = b.dni;
+        if (dni !== undefined && dni !== null) dni = String(dni).trim();
+        else dni = '';
         return {
             ...b,
             numeroBono: numBono,
             numeroSocio: numSocio,
+            dni: dni,
             estado: b.estado || 'pendiente',
             conceptos: safeConceptos(b)
         };
@@ -2073,11 +2082,12 @@ function findExistingSocio({ dni, nombreResp, nombreAlumno }) {
     const norm = (str) => (str || '').toUpperCase().trim().replace(/\s+/g, ' ');
 
     // Prioridad 1: por DNI (muy estricto - evita duplicados)
-    if (dni && dni.trim() !== '') {
-        const dniClean = dni.trim().replace(/[\.\s]/g, '');
+    // dni puede ser número desde Google Sheets, convertir a string
+    const dniStr = String(dni || '').trim().replace(/[\.\s]/g, '');
+    if (dniStr !== '') {
         const byDni = socios.find(s => {
-            const sDni = (s.dni || '').trim().replace(/[\.\s]/g, '');
-            return sDni === dniClean && sDni !== '';
+            const sDni = String(s.dni || '').trim().replace(/[\.\s]/g, '');
+            return sDni === dniStr && sDni !== '';
         });
         if (byDni) return { socio: byDni, matchType: 'DNI' };
     }
