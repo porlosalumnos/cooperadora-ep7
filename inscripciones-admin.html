@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Inscripciones Online - EP7</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif}body{background:#f0f4f8;color:#1f2937}.header{background:linear-gradient(135deg,#1e40af,#4338ca);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}.header h1{font-size:1.15rem}.nav{display:flex;gap:8px;flex-wrap:wrap}.nav a{color:#fff;text-decoration:none;background:rgba(255,255,255,.14);padding:9px 13px;border-radius:18px;font-weight:800;font-size:.86rem}.container{max-width:1200px;margin:22px auto;padding:0 16px}.card{background:#fff;border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 3px 14px rgba(15,23,42,.08);border:1px solid #e5e7eb}.card h2,.card h3{color:#1e40af;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.field label{display:block;font-weight:800;margin-bottom:5px;color:#374151;font-size:.86rem}.field input,.field select,.field textarea{width:100%;padding:10px;border:2px solid #e5e7eb;border-radius:10px;font-size:.95rem}.field textarea{min-height:74px}.btn{border:none;border-radius:22px;padding:10px 15px;font-weight:900;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:.9rem}.btn-primary{background:#2563eb;color:#fff}.btn-success{background:#10b981;color:#fff}.btn-warning{background:#f59e0b;color:#fff}.btn-danger{background:#ef4444;color:#fff}.btn-secondary{background:#e5e7eb;color:#374151}.btn-info{background:#0ea5e9;color:#fff}.btn:disabled{opacity:.55;cursor:not-allowed}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.status{display:none;border-radius:14px;padding:13px 15px;margin:14px 0;font-weight:800}.status.ok{display:block;background:#ecfdf5;color:#065f46;border:2px solid #10b981}.status.err{display:block;background:#fef2f2;color:#991b1b;border:2px solid #ef4444}.status.info{display:block;background:#eff6ff;color:#1e40af;border:2px solid #bfdbfe}.table-wrap{overflow:auto;border:1px solid #e5e7eb;border-radius:14px}table{width:100%;border-collapse:collapse;background:#fff;font-size:.86rem}th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}th{background:#eff6ff;color:#1e40af;font-weight:900;position:sticky;top:0}.badge{display:inline-block;border-radius:999px;padding:4px 9px;font-size:.76rem;font-weight:900}.b-pendiente{background:#fef3c7;color:#92400e}.b-incompleta{background:#fee2e2;color:#991b1b}.b-corregida{background:#dbeafe;color:#1e40af}.b-lista{background:#e0e7ff;color:#3730a3}.b-impresa{background:#dcfce7;color:#166534}.muted{color:#64748b;font-size:.86rem;line-height:1.5}.hidden{display:none!important}.print-box{background:#fff}.print-section{border:1px solid #cbd5e1;border-radius:12px;margin:10px 0;overflow:hidden}.print-section h4{background:#eff6ff;color:#1e40af;padding:8px 10px}.print-grid{display:grid;grid-template-columns:repeat(2,1fr)}.print-item{border-top:1px solid #e5e7eb;padding:7px 10px;min-height:33px}.print-item strong{display:block;color:#334155;font-size:.75rem}.print-item span{font-size:.9rem}@media(max-width:850px){.grid,.grid3{grid-template-columns:1fr}.actions .btn{width:100%}th,td{font-size:.78rem;padding:8px}}@media print{.header,.no-print,.actions,.config-card,#statusBox,#listCard{display:none!important}.container{max-width:100%;margin:0;padding:0}.card{box-shadow:none;border:none}.print-section{break-inside:avoid}.print-grid{grid-template-columns:repeat(2,1fr)}body{background:#fff}}
+</style>
+</head>
+<body>
+<header class="header no-print">
+  <div>
+    <h1>🛠️ Administración de Inscripciones Online</h1>
+    <p>Escuela Primaria N°7 Juan Bautista Alberdi</p>
+  </div>
+  <nav class="nav">
+    <a href="index.html">🏠 Inicio</a>
+    <a href="inscripcion.html">📝 Formulario público</a>
+    <a href="pagos.html">💳 Pagos</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div id="statusBox" class="status"></div>
+
+  <section class="card config-card no-print">
+    <h2>🔐 Conexión administrativa</h2>
+    <p class="muted" style="margin-bottom:12px;">Ingresá la URL del Apps Script y la clave administrativa. Se guardan solo en este dispositivo.</p>
+    <div class="grid">
+      <div class="field">
+        <label>URL Web App de Apps Script</label>
+        <input id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+      </div>
+      <div class="field">
+        <label>Clave administrativa</label>
+        <input id="adminKey" type="password" placeholder="Clave admin del Apps Script">
+      </div>
+    </div>
+    <div class="actions" style="margin-top:12px;">
+      <button class="btn btn-primary" onclick="guardarConfig()">💾 Guardar conexión</button>
+      <button class="btn btn-success" onclick="cargarInscripciones()">🔄 Cargar inscripciones</button>
+      <button class="btn btn-secondary" onclick="limpiarConfig()">🧹 Limpiar datos guardados</button>
+    </div>
+  </section>
+
+  <section class="card no-print" id="listCard">
+    <h2>📋 Inscripciones recibidas</h2>
+    <div class="grid3" style="margin-bottom:12px;">
+      <div class="field"><label>Buscar</label><input id="buscar" placeholder="Alumno, DNI, responsable..." oninput="renderLista()"></div>
+      <div class="field"><label>Estado</label><select id="filtroEstado" onchange="renderLista()"><option value="">Todos</option><option value="pendiente_revision">Pendiente revisión</option><option value="incompleta">Incompleta</option><option value="corregida">Corregida</option><option value="lista_para_imprimir">Lista para imprimir</option><option value="impresa">Impresa</option></select></div>
+      <div class="field"><label>Impresión</label><select id="filtroImpresa" onchange="renderLista()"><option value="">Todas</option><option value="NO">No impresas</option><option value="SI">Impresas</option></select></div>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Alumno/a</th><th>DNI</th><th>Responsable</th><th>Año/Turno</th><th>Estado</th><th>Impresa</th><th>Acciones</th></tr></thead><tbody id="tbody"><tr><td colspan="8" class="muted">Cargá la conexión y tocá “Cargar inscripciones”.</td></tr></tbody></table></div>
+  </section>
+
+  <section class="card hidden" id="detalleCard">
+    <div class="actions no-print" style="justify-content:space-between;margin-bottom:12px;">
+      <button class="btn btn-secondary" onclick="cerrarDetalle()">⬅️ Volver al listado</button>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="imprimirDetalle()">🖨️ Imprimir planilla</button>
+        <button class="btn btn-success" onclick="marcarImpresaActual()">✅ Marcar como impresa</button>
+        <button class="btn btn-warning" onclick="cambiarEstadoActual('incompleta')">⚠️ Marcar incompleta</button>
+        <button class="btn btn-info" onclick="cambiarEstadoActual('lista_para_imprimir')">📄 Lista para imprimir</button>
+      </div>
+    </div>
+    <div id="detallePrint" class="print-box"></div>
+  </section>
+</div>
+
+<script>
+let DATA=[];
+let ACTUAL=null;
+
+function showStatus(msg,type='info'){const b=document.getElementById('statusBox');b.className='status '+type;b.innerHTML=msg;b.scrollIntoView({behavior:'smooth',block:'start'});}function clearStatus(){const b=document.getElementById('statusBox');b.className='status';b.innerHTML='';}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fmtFecha(v){if(!v)return'';try{const d=new Date(v);if(!isNaN(d))return d.toLocaleString('es-AR');}catch(e){}return v;}
+function getConfig(){return{url:document.getElementById('scriptUrl').value.trim(),adminKey:document.getElementById('adminKey').value.trim()};}
+function guardarConfig(){const c=getConfig();localStorage.setItem('ep7_insc_admin_url',c.url);localStorage.setItem('ep7_insc_admin_key',c.adminKey);showStatus('✅ Conexión guardada en este dispositivo.','ok');}
+function cargarConfig(){document.getElementById('scriptUrl').value=localStorage.getItem('ep7_insc_admin_url')||'';document.getElementById('adminKey').value=localStorage.getItem('ep7_insc_admin_key')||'';}
+function limpiarConfig(){localStorage.removeItem('ep7_insc_admin_url');localStorage.removeItem('ep7_insc_admin_key');document.getElementById('scriptUrl').value='';document.getElementById('adminKey').value='';showStatus('Datos locales borrados.','info');}
+function assertConfig(){const c=getConfig();if(!c.url.startsWith('http'))throw new Error('Falta URL válida del Apps Script.');if(!c.adminKey)throw new Error('Falta clave administrativa.');return c;}
+
+async function cargarInscripciones(){
+  clearStatus();
+  try{
+    const c=assertConfig(); guardarConfig();
+    showStatus('⏳ Cargando inscripciones...','info');
+    const url=c.url+'?action=list&adminKey='+encodeURIComponent(c.adminKey)+'&_=' + Date.now();
+    const res=await fetch(url,{method:'GET',redirect:'follow'});
+    const text=await res.text();
+    const json=JSON.parse(text);
+    if(!json.ok) throw new Error(json.error||'No se pudo leer la planilla');
+    DATA=json.data||[];
+    renderLista();
+    showStatus('✅ Inscripciones cargadas: '+DATA.length,'ok');
+  }catch(err){console.error(err);showStatus('❌ '+esc(err.message),'err');}
+}
+function estadoBadge(estado){const e=estado||'pendiente_revision';const cls={pendiente_revision:'b-pendiente',incompleta:'b-incompleta',corregida:'b-corregida',lista_para_imprimir:'b-lista',impresa:'b-impresa'}[e]||'b-pendiente';return '<span class="badge '+cls+'">'+esc(e)+'</span>';}
+function renderLista(){
+  const q=(document.getElementById('buscar').value||'').toLowerCase();
+  const fe=document.getElementById('filtroEstado').value;
+  const fi=document.getElementById('filtroImpresa').value;
+  let arr=DATA.slice();
+  if(q) arr=arr.filter(r=>JSON.stringify(r).toLowerCase().includes(q));
+  if(fe) arr=arr.filter(r=>(r.estado||'')===fe);
+  if(fi) arr=arr.filter(r=>(r.usoInterno_impresa||'NO')===fi);
+  const tb=document.getElementById('tbody');
+  if(!arr.length){tb.innerHTML='<tr><td colspan="8" class="muted">No hay inscripciones con ese filtro.</td></tr>';return;}
+  tb.innerHTML=arr.map(r=>{
+    const alumno=((r.est_apellidos||'')+' '+(r.est_nombres||'')).trim();
+    const resp=((r.resp1_apellidos||'')+' '+(r.resp1_nombres||'')).trim();
+    return `<tr>
+      <td>${esc(fmtFecha(r.fechaEnvio))}</td>
+      <td><strong>${esc(alumno||'Sin nombre')}</strong></td>
+      <td>${esc(r.est_dni||'')}</td>
+      <td>${esc(resp)}<br><span class="muted">${esc(r.resp1_celular||'')}</span></td>
+      <td>${esc(r.insc_anio||'')}<br><span class="muted">${esc(r.insc_turno||'')}</span></td>
+      <td>${estadoBadge(r.estado)}</td>
+      <td>${(r.usoInterno_impresa==='SI')?'✅ SI':'— NO'}</td>
+      <td><div class="actions"><button class="btn btn-primary" onclick="verDetalle('${esc(r.idInscripcion)}')">👁️ Ver</button><button class="btn btn-success" onclick="marcarImpresa('${esc(r.idInscripcion)}')">✅ Impresa</button></div></td>
+    </tr>`;
+  }).join('');
+}
+function findById(id){return DATA.find(r=>String(r.idInscripcion)===String(id));}
+function verDetalle(id){ACTUAL=findById(id);if(!ACTUAL)return;document.getElementById('detallePrint').innerHTML=buildPrint(ACTUAL);document.getElementById('detalleCard').classList.remove('hidden');document.getElementById('detalleCard').scrollIntoView({behavior:'smooth'});}
+function cerrarDetalle(){document.getElementById('detalleCard').classList.add('hidden');ACTUAL=null;}
+
+const SECCIONES=[
+ ['Datos del estudiante',[['est_apellidos','Apellido/s'],['est_nombres','Nombre/s'],['est_fecha_nacimiento','Fecha nacimiento'],['est_identidad_genero','Identidad género'],['est_nacionalidad','Nacionalidad'],['est_dni_estado','DNI argentino'],['est_dni','N° DNI'],['est_cuil','CUIL'],['est_lugar_nacimiento','Lugar nacimiento']]],
+ ['Domicilio y contacto',[['est_dom_calle','Calle'],['est_dom_numero','N°'],['est_dom_piso_torre_depto','Piso/Torre/Depto'],['est_dom_entre1','Entre calle'],['est_dom_entre2','Y calle'],['est_dom_provincia','Provincia'],['est_dom_distrito','Distrito'],['est_dom_localidad','Localidad'],['est_telefono','Teléfono'],['est_celular','Celular'],['est_hermanos','Hermanos'],['est_hermanos_cantidad','Cantidad hermanos'],['est_hermanos_en_escuela','Hermanos en escuela'],['est_transporte','Transporte']]],
+ ['Salud',[['salud_obra_social','Obra social'],['salud_obra_social_nombre','Nombre obra social'],['salud_obra_social_afiliado','N° afiliado'],['salud_condiciones','Condiciones'],['salud_observaciones','Observaciones'],['salud_alergia_grave','Alergia grave'],['salud_alergias','Tipos de alergia'],['salud_alergias_detalle','Detalle alergias'],['salud_internacion','Internación'],['salud_internacion_causas','Causas internación'],['salud_medicacion','Medicación'],['salud_medicacion_detalle','Cuál medicación'],['salud_operacion','Operación'],['salud_operacion_motivo','Motivo operación'],['salud_auditiva','Auditiva'],['salud_visual','Visual'],['salud_ejercicio','Ejercicio'],['salud_familiar','Antecedentes familiares']]],
+ ['Inscripción y trayectoria',[['insc_anio_lectivo','Año lectivo'],['insc_anio','Se inscribe en'],['insc_turno','Turno'],['insc_jornada','Jornada'],['insc_condicion','Condición'],['insc_areas_pendientes','Áreas pendientes'],['esc_nombre','Escuela'],['esc_numero','N°'],['esc_distrito','Distrito'],['proc_nombre','Escuela procedencia'],['proc_numero','N° procedencia'],['tray_jardin','Jardín'],['incl_proyecto','Proyecto inclusión'],['incl_detalle','Detalle inclusión'],['comp_instituciones','Instituciones complementarias'],['sae_solicita','SAE solicitado']]],
+ ['Responsable 1',[['resp1_vinculo','Vínculo'],['resp1_apellidos','Apellido/s'],['resp1_nombres','Nombre/s'],['resp1_nacionalidad','Nacionalidad'],['resp1_dni','DNI'],['resp1_dni_estado','DNI argentino'],['resp1_ocupacion','Ocupación'],['resp1_telefono','Teléfono'],['resp1_celular','Celular'],['resp1_email','Correo'],['resp1_convive','Convive'],['resp1_dom_calle','Calle'],['resp1_dom_numero','N°'],['resp1_dom_localidad','Localidad'],['resp1_educ_nivel','Nivel educativo'],['resp1_educ_completo','Completó'],['resp1_actividad','Actividad']]],
+ ['Responsable 2',[['resp2_vinculo','Vínculo'],['resp2_apellidos','Apellido/s'],['resp2_nombres','Nombre/s'],['resp2_nacionalidad','Nacionalidad'],['resp2_dni','DNI'],['resp2_ocupacion','Ocupación'],['resp2_telefono','Teléfono'],['resp2_celular','Celular'],['resp2_email','Correo'],['resp2_convive','Convive'],['resp2_dom_calle','Calle'],['resp2_dom_numero','N°'],['resp2_dom_localidad','Localidad'],['resp2_educ_nivel','Nivel educativo'],['resp2_educ_completo','Completó'],['resp2_actividad','Actividad']]],
+ ['Restricciones / DDJJ / Uso interno',[['restr_apellidos','Restricción apellido'],['restr_nombres','Restricción nombre'],['restr_tipo_doc','Tipo doc'],['restr_num_doc','N° doc'],['restr_descripcion','Descripción restricción'],['ddjj_responsable','Declarante'],['ddjj_fecha','Fecha DDJJ'],['estado','Estado'],['usoInterno_observaciones','Observaciones internas'],['usoInterno_revisadoPor','Revisado por'],['usoInterno_fechaRevision','Fecha revisión'],['usoInterno_impresa','Impresa']]]
+];
+function buildPrint(r){
+  const alumno=((r.est_apellidos||'')+' '+(r.est_nombres||'')).trim();
+  return `<div style="text-align:center;margin-bottom:14px;"><h2 style="color:#1e40af;">Solicitud de Inscripción - Educación Primaria</h2><p><strong>Escuela Primaria N°7 Juan Bautista Alberdi</strong><br>San Miguel, Buenos Aires — 1926-2026 Centenario</p><p><strong>N° recepción:</strong> ${esc(r.idInscripcion||'')} — <strong>Fecha:</strong> ${esc(fmtFecha(r.fechaEnvio))}</p></div>`+
+  SECCIONES.map(sec=>`<div class="print-section"><h4>${sec[0]}</h4><div class="print-grid">${sec[1].map(([k,l])=>`<div class="print-item"><strong>${esc(l)}</strong><span>${esc(r[k]||'')}</span></div>`).join('')}</div></div>`).join('')+
+  `<div class="print-section"><h4>Firmas</h4><div class="print-grid"><div class="print-item"><strong>Firma persona responsable</strong><span>____________________________</span></div><div class="print-item"><strong>Aclaración</strong><span>____________________________</span></div><div class="print-item"><strong>Firma Directora/Director</strong><span>____________________________</span></div><div class="print-item"><strong>Fecha de impresión</strong><span>${new Date().toLocaleDateString('es-AR')}</span></div></div></div>`;
+}
+function imprimirDetalle(){if(!ACTUAL)return;window.print();}
+
+async function updateInterno(id,updates){
+  const c=assertConfig();
+  const payload={action:'updateInternal',adminKey:c.adminKey,idInscripcion:id,updates:updates};
+  const res=await fetch(c.url,{method:'POST',body:JSON.stringify(payload),redirect:'follow'});
+  const text=await res.text();
+  const json=JSON.parse(text);
+  if(!json.ok) throw new Error(json.error||'No se pudo actualizar');
+  const idx=DATA.findIndex(r=>String(r.idInscripcion)===String(id)); if(idx>=0) DATA[idx]={...DATA[idx],...updates};
+  if(ACTUAL&&String(ACTUAL.idInscripcion)===String(id)){ACTUAL={...ACTUAL,...updates};document.getElementById('detallePrint').innerHTML=buildPrint(ACTUAL);} renderLista();
+}
+async function marcarImpresa(id){
+  try{const revisadoPor=prompt('Nombre de quien marca como impresa:',localStorage.getItem('ep7_revisor')||'')||'';if(revisadoPor)localStorage.setItem('ep7_revisor',revisadoPor);await updateInterno(id,{estado:'impresa',usoInterno_impresa:'SI',usoInterno_fechaRevision:new Date().toISOString(),usoInterno_revisadoPor:revisadoPor});showStatus('✅ Marcada como impresa.','ok');}catch(e){showStatus('❌ '+esc(e.message),'err');}
+}
+function marcarImpresaActual(){if(ACTUAL)marcarImpresa(ACTUAL.idInscripcion);}
+async function cambiarEstadoActual(estado){
+  if(!ACTUAL)return; const obs=prompt('Observación interna opcional:',ACTUAL.usoInterno_observaciones||'')||ACTUAL.usoInterno_observaciones||'';
+  try{await updateInterno(ACTUAL.idInscripcion,{estado:estado,usoInterno_observaciones:obs,usoInterno_fechaRevision:new Date().toISOString()});showStatus('✅ Estado actualizado.','ok');}catch(e){showStatus('❌ '+esc(e.message),'err');}
+}
+
+cargarConfig();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0bb7731fe5b4703',t:'MTc4MTQ2MjQ0OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
