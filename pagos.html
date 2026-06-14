@@ -1954,10 +1954,15 @@ function getBonos() {
         let numBono = b.numeroBono;
         if (typeof numBono === 'number') numBono = String(numBono);
         if (typeof numBono === 'string') numBono = numBono.padStart(5, '0');
-        // Normalizar numeroSocio: siempre string con padStart(4,'0')
+        // Normalizar numeroSocio: solo padStart si es numérico. Algunos bonos (Planilla/Cuaderno)
+        // no generan socio y se guardan como SIN SOCIO.
         let numSocio = b.numeroSocio;
+        if (numSocio === undefined || numSocio === null || numSocio === '') numSocio = 'SIN SOCIO';
         if (typeof numSocio === 'number') numSocio = String(numSocio);
-        if (typeof numSocio === 'string') numSocio = numSocio.padStart(4, '0');
+        if (typeof numSocio === 'string') {
+            numSocio = numSocio.trim();
+            if (/^\d+$/.test(numSocio)) numSocio = numSocio.padStart(4, '0');
+        }
         // Normalizar dni: siempre string
         let dni = b.dni;
         if (dni !== undefined && dni !== null) dni = String(dni).trim();
@@ -2848,6 +2853,18 @@ function getTotal() {
     return getConceptos().reduce((s, i) => s + i.monto, 0);
 }
 
+function esPagoSinSocio(items = getConceptos()) {
+    // Cuaderno y Planilla son pagos administrativos: generan bono, pero NO número de socio
+    // y NO se agregan al Registro/Libro de Socios. Si incluye Cuota o Donación, sí corresponde socio.
+    if (!items || items.length === 0) return false;
+    return items.every(i => i.tipo === 'Cuaderno' || i.tipo === 'Planilla');
+}
+
+function getBonoSocioLabel(bono) {
+    const n = bono && bono.numeroSocio ? String(bono.numeroSocio).trim() : '';
+    return (!n || n === 'SIN SOCIO' || n === '0000') ? 'SIN SOCIO' : 'SOCIO N° ' + n;
+}
+
 function updateSubtotalMeses() {
     const c = PAY.mesesSel.length;
     document.getElementById('meses-subtotal').textContent =
@@ -2925,13 +2942,14 @@ function updateResumen() {
 function renderResumenFinal() {
     const items = getConceptos();
     const total = getTotal();
-    const numSocio = PAY.socioExistente
-        ? PAY.socioExistente.numeroSocio
-        : '(nuevo - se asignará)';
+    const pagoSinSocio = esPagoSinSocio(items);
+    const numSocio = pagoSinSocio
+        ? 'No corresponde (Cuaderno/Planilla)'
+        : (PAY.socioExistente ? PAY.socioExistente.numeroSocio : '(nuevo - se asignará)');
 
     document.getElementById('resumenFinal').innerHTML = `
         <div class="resumen-box">
-            <h3>👤 Datos del Socio</h3>
+            <h3>👤 Datos del Pago</h3>
             <div class="resumen-item">
                 <span><b>N° Socio:</b></span>
                 <span><b>${numSocio}</b></span>
@@ -2974,9 +2992,15 @@ function renderResumenFinal() {
 // GENERAR BONO
 // ================================================
 function generarBono() {
+    const items = getConceptos();
+    const total = getTotal();
+    const now = new Date();
+    const numeroBono = getNextBonoNum();
+    const pagoSinSocio = esPagoSinSocio(items);
+
     // Chequeo final anti-duplicado de cuotas (por si alguien fuerza la UI)
     let yaPagadas = [];
-    if (PAY.socioExistente) {
+    if (!pagoSinSocio && PAY.socioExistente) {
         const año = PAY.año || CFG.añoActual || 2026;
         yaPagadas = getMesesPagados(PAY.socioExistente.numeroSocio, año);
     }
@@ -2986,80 +3010,84 @@ function generarBono() {
         return;
     }
 
-    const items = getConceptos();
-    const total = getTotal();
-    const now = new Date();
-    const numeroBono = getNextBonoNum();
+    const datosPago = {
+        numeroSocio:  'SIN SOCIO',
+        nombreResp:   document.getElementById('fNombreResp').value.trim(),
+        nombreAlumno: document.getElementById('fNombreAlumno').value.trim(),
+        telefono:     document.getElementById('fTelefono').value.trim(),
+        domicilio:    document.getElementById('fDomicilio').value.trim(),
+        dni:          document.getElementById('fDni').value.trim(),
+        division:     PAY.division
+    };
 
-    // Determinar / crear socio
-    let socio;
-    if (PAY.socioExistente) {
-        // Actualizar datos del socio existente
-        socio = PAY.socioExistente;
-        const socios = getSocios();
-        const idx = socios.findIndex(s => s.numeroSocio === socio.numeroSocio);
-        if (idx >= 0) {
-            socios[idx].nombreResp   = document.getElementById('fNombreResp').value.trim();
-            socios[idx].nombreAlumno = document.getElementById('fNombreAlumno').value.trim();
-            socios[idx].telefono     = document.getElementById('fTelefono').value.trim();
-            socios[idx].domicilio    = document.getElementById('fDomicilio').value.trim();
-            socios[idx].dni          = document.getElementById('fDni').value.trim();
-            socios[idx].division     = PAY.division;
-            socios[idx].totalPagado  = (socios[idx].totalPagado || 0) + total;
-            socios[idx].bonos        = [...(socios[idx].bonos || []), numeroBono];
-            saveSocios(socios);
-            socio = socios[idx];
-        }
-    } else {
-        // Crear nuevo socio - con chequeo de duplicado final
-        const dni = document.getElementById('fDni').value.trim();
-        const resp = document.getElementById('fNombreResp').value.trim();
-        const alum = document.getElementById('fNombreAlumno').value.trim();
-        const tel = document.getElementById('fTelefono').value.trim();
+    let socio = datosPago;
 
-        const existente = findExistingSocio({ dni, nombreResp: resp, nombreAlumno: alum });
-        if (existente) {
-            // Usar el existente en vez de crear duplicado
-            socio = existente.socio;
+    if (!pagoSinSocio) {
+        // Determinar / crear socio SOLO para cuotas/donaciones. Cuaderno y Planilla no crean socio.
+        if (PAY.socioExistente) {
+            // Actualizar datos del socio existente
+            socio = PAY.socioExistente;
             const socios = getSocios();
             const idx = socios.findIndex(s => s.numeroSocio === socio.numeroSocio);
             if (idx >= 0) {
-                socios[idx].nombreResp   = resp;
-                socios[idx].nombreAlumno = alum;
-                socios[idx].telefono     = tel;
-                socios[idx].domicilio    = document.getElementById('fDomicilio').value.trim();
-                socios[idx].dni          = dni;
-                socios[idx].division     = PAY.division;
+                socios[idx].nombreResp   = datosPago.nombreResp;
+                socios[idx].nombreAlumno = datosPago.nombreAlumno;
+                socios[idx].telefono     = datosPago.telefono;
+                socios[idx].domicilio    = datosPago.domicilio;
+                socios[idx].dni          = datosPago.dni;
+                socios[idx].division     = datosPago.division;
                 socios[idx].totalPagado  = (socios[idx].totalPagado || 0) + total;
                 socios[idx].bonos        = [...(socios[idx].bonos || []), numeroBono];
                 saveSocios(socios);
                 socio = socios[idx];
             }
         } else {
-            const nuevoNum = getNextSocioNum();
-            socio = {
-                numeroSocio:  nuevoNum,
-                nombreResp:   resp,
-                nombreAlumno: alum,
-                telefono:     tel,
-                domicilio:    document.getElementById('fDomicilio').value.trim(),
-                dni:          dni,
-                division:     PAY.division,
-                fechaAlta:    now.toLocaleDateString('es-AR'),
-                fechaBaja:    null,
-                totalPagado:  total,
-                bonos:        [numeroBono]
-            };
-            const socios = getSocios();
-            socios.push(socio);
-            saveSocios(socios);
+            // Crear nuevo socio - con chequeo de duplicado final
+            const existente = findExistingSocio({ dni: datosPago.dni, nombreResp: datosPago.nombreResp, nombreAlumno: datosPago.nombreAlumno });
+            if (existente) {
+                // Usar el existente en vez de crear duplicado
+                socio = existente.socio;
+                const socios = getSocios();
+                const idx = socios.findIndex(s => s.numeroSocio === socio.numeroSocio);
+                if (idx >= 0) {
+                    socios[idx].nombreResp   = datosPago.nombreResp;
+                    socios[idx].nombreAlumno = datosPago.nombreAlumno;
+                    socios[idx].telefono     = datosPago.telefono;
+                    socios[idx].domicilio    = datosPago.domicilio;
+                    socios[idx].dni          = datosPago.dni;
+                    socios[idx].division     = datosPago.division;
+                    socios[idx].totalPagado  = (socios[idx].totalPagado || 0) + total;
+                    socios[idx].bonos        = [...(socios[idx].bonos || []), numeroBono];
+                    saveSocios(socios);
+                    socio = socios[idx];
+                }
+            } else {
+                const nuevoNum = getNextSocioNum();
+                socio = {
+                    numeroSocio:  nuevoNum,
+                    nombreResp:   datosPago.nombreResp,
+                    nombreAlumno: datosPago.nombreAlumno,
+                    telefono:     datosPago.telefono,
+                    domicilio:    datosPago.domicilio,
+                    dni:          datosPago.dni,
+                    division:     datosPago.division,
+                    fechaAlta:    now.toLocaleDateString('es-AR'),
+                    fechaBaja:    null,
+                    totalPagado:  total,
+                    bonos:        [numeroBono]
+                };
+                const socios = getSocios();
+                socios.push(socio);
+                saveSocios(socios);
+            }
         }
     }
 
-    // Crear bono
+    // Crear bono. Todo pago genera bono, pero Cuaderno/Planilla quedan como SIN SOCIO.
     const bono = {
         numeroBono,
-        numeroSocio:  socio.numeroSocio,
+        numeroSocio:  pagoSinSocio ? 'SIN SOCIO' : socio.numeroSocio,
+        pagoSinSocio: pagoSinSocio ? 'SI' : 'NO',
         fecha:        now.toLocaleDateString('es-AR'),
         hora:         now.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' }),
         fechaISO:     now.toISOString(),
@@ -3080,7 +3108,7 @@ function generarBono() {
     saveBonos(bonos);
 
     PAY.bonoActual = bono;
-    PAY.socioActualNum = socio.numeroSocio;
+    PAY.socioActualNum = bono.numeroSocio;
 
     // Renderizar bono
     document.getElementById('bonoRender').innerHTML = buildBonoHTML(bono);
@@ -3123,7 +3151,7 @@ function buildBonoHTML(bono) {
 
         <div class="bono-numero-row">
             <div class="bono-numero">BONO N° ${bono.numeroBono}</div>
-            <div class="bono-socio-num">SOCIO N° ${bono.numeroSocio}</div>
+            <div class="bono-socio-num">${getBonoSocioLabel(bono)}</div>
         </div>
 
         <div class="bono-body">
@@ -3197,7 +3225,7 @@ function enviarWA() {
     msg += `📍 ${getDireccionEscuela()} — ${getLeyendaCentenario()}\n`;
     msg += `✉️ ${getEmailContacto()}\n`;
     msg += `📄 *BONO DE CONTRIBUCIÓN*\n`;
-    msg += `*Bono N° ${bono.numeroBono} | Socio N° ${bono.numeroSocio}*\n`;
+    msg += `*Bono N° ${bono.numeroBono} | ${getBonoSocioLabel(bono)}*\n`;
     msg += `━━━━━━━━━━━━━━━━━\n\n`;
     msg += `📅 *Fecha:* ${bono.fecha} ${bono.hora}\n`;
     msg += `👤 *Responsable:* ${bono.responsable}\n`;
@@ -3303,7 +3331,7 @@ window.addEventListener('afterprint', function () {
 function descargarTxt() {
     const bono = PAY.bonoActual;
     if (!bono) return;
-    let txt = `BONO N° ${bono.numeroBono} | SOCIO N° ${bono.numeroSocio}\n`;
+    let txt = `BONO N° ${bono.numeroBono} | ${getBonoSocioLabel(bono)}\n`;
     txt += `${getNombreEscuela()}\n`;
     txt += `${getDireccionEscuela()} — ${getLeyendaCentenario()}\n`;
     txt += `WhatsApp: ${getTelefonoDisplay()} | Email: ${getEmailContacto()}\n`;
@@ -3323,7 +3351,7 @@ function descargarTxt() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Bono_${bono.numeroBono}_Socio_${bono.numeroSocio}.txt`;
+    a.download = `Bono_${bono.numeroBono}_${bono.numeroSocio === 'SIN SOCIO' ? 'Sin_Socio' : 'Socio_' + bono.numeroSocio}.txt`;
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -3652,8 +3680,12 @@ function copiarLinkInscripcion(numBono) {
     const bono = getBonos().find(b => b.numeroBono === numBono);
     if (!bono) return;
     const base = new URL('inscripcion.html', window.location.href).href;
-    const url = base + '?bono=' + encodeURIComponent(bono.numeroBono || '');
-    const msg = 'Link para completar la inscripción online:\n' + url + '\n\nIngresá con el N° de bono ' + (bono.numeroBono || '') + '. La inscripción se habilita cuando el pago de Planilla está confirmado.';
+    const params = new URLSearchParams();
+    params.set('bono', bono.numeroBono || '');
+    if (bono.dni) params.set('dni', bono.dni);
+    if (bono.numeroSocio && bono.numeroSocio !== 'SIN SOCIO') params.set('socio', bono.numeroSocio);
+    const url = base + '?' + params.toString();
+    const msg = 'Link para completar la inscripción online:\n' + url + '\n\nPara habilitarla se pedirá el DNI del responsable y el N° de bono ' + (bono.numeroBono || '') + '. La inscripción se libera solo si ambos datos coinciden con un pago confirmado de Planilla.';
     copyTxt(msg);
     alert('✅ Link de inscripción copiado. Podés enviarlo por WhatsApp.');
 }
@@ -4745,6 +4777,5 @@ function checkImportVisibility() {
     </div>
 </div>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0b2d52608c1c816',t:'MTc4MTM3MTkyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0bc47131dc3ebcc',t:'MTc4MTQ3MDk2Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0bc78307fedebcc',t:'MTc4MTQ3Mjk3NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
