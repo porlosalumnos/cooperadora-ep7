@@ -1166,6 +1166,7 @@
     </div>
     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 <nav class="nav" id="mainNav">
+        <a href="index.html">🏠 Inicio</a>
         <a class="active" onclick="showTab('pago', this)">💳 Pagar</a>
         <a onclick="showTab('socios', this)">👥 Socios</a>
         <a onclick="showTab('bonos', this)">📄 Bonos</a>
@@ -1188,8 +1189,8 @@
         <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; font-size:0.92rem;">
             <span><strong>📱 WhatsApp:</strong> +54 9 11 7824-4846</span>
             <button class="copy-btn" onclick="copyTxt('+54 9 11 7824-4846')">Copiar</button>
-            <span><strong>✉️ Correo:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="50333f3f2035206710373d31393c7e333f3d">[email&#160;protected]</a></span>
-            <button class="copy-btn" onclick="copyTxt('coopep7@gmail.com')">Copiar</button>
+            <span><strong>✉️ Correo:</strong> <span class="js-email-contacto"></span></span>
+            <button class="copy-btn" onclick="copyEmailContacto()">Copiar</button>
         </div>
     </div>
 
@@ -1431,8 +1432,8 @@
                 <button class="copy-btn" onclick="copyTxt('+54 9 11 7824-4846')">Copiar</button>
             </div>
             <div class="bank-detail">
-                <span><strong>✉️ Correo:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="dcbfb3b3acb9aceb9cbbb1bdb5b0f2bfb3b1">[email&#160;protected]</a></span>
-                <button class="copy-btn" onclick="copyTxt('coopep7@gmail.com')">Copiar</button>
+                <span><strong>✉️ Correo:</strong> <span class="js-email-contacto"></span></span>
+                <button class="copy-btn" onclick="copyEmailContacto()">Copiar</button>
             </div>
         </div>
 
@@ -1629,7 +1630,8 @@
                 <div class="form-group">
                     <label>Correo de contacto</label>
                     <input type="email" id="cfgEmail"
-                           value="coopep7@gmail.com"
+                           value=""
+                           placeholder="correo de la cooperadora"
                            oninput="saveConfig()">
                 </div>
             </div>
@@ -1767,8 +1769,8 @@
         <h3 style="margin-bottom: 12px; font-size: 1.1rem;">📬 Cooperadora Escuela N° 7 Juan Bautista Alberdi</h3>
         <p style="opacity: 0.9; margin-bottom: 15px; font-size: 0.9rem;">Año Centenario 1926-2026 — Serrano N° 1326 — San Miguel, Bs. As.</p>
         <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; align-items: center;">
-            <a href="/cdn-cgi/l/email-protection#0b6864647b6e7b3c4b6c666a626725686466" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
-                📧 <span class="__cf_email__" data-cfemail="b1d2dedec1d4c186f1d6dcd0d8dd9fd2dedc">[email&#160;protected]</span>
+            <a href="#" onclick="return abrirEmailContacto()" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
+                📧 <span class="js-email-contacto"></span>
             </a>
             <a href="https://www.instagram.com/cooperadora.ep7?igsh=YnV2YXdjN3c5amc5" target="_blank" style="color: white; text-decoration: none; background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: all 0.3s;">
                 📷 Instagram
@@ -1803,7 +1805,7 @@
 <!-- ================================================================ -->
 <!--                        JAVASCRIPT                                -->
 <!-- ================================================================ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 
 // ================================================
 // CONFIGURACIÓN
@@ -1814,7 +1816,9 @@ let CFG = {
     leyendaCentenario: '1926-2026 Centenario',
     telefono: '5491178244846',
     telefonoDisplay: '+54 9 11 7824-4846',
-    email: 'coopep7@gmail.com',
+    email: '',
+    emailUser: 'coopep7',
+    emailDomain: 'gmail.com',
     adminPass: 'coop2025',
     precioCuota: 5000,
     precioCuaderno: 10000,
@@ -1830,9 +1834,13 @@ let CFG = {
     ]
 };
 
+function getDefaultEmailContacto() {
+    return [CFG.emailUser || 'coopep7', CFG.emailDomain || 'gmail.com'].join('@');
+}
+
 function normalizarConfigContacto() {
     // Si hay configuración vieja guardada en navegador o Google Sheets, completamos/actualizamos estos datos.
-    if (!CFG.email) CFG.email = 'coopep7@gmail.com';
+    if (!CFG.email) CFG.email = getDefaultEmailContacto();
     if (!CFG.telefonoDisplay) CFG.telefonoDisplay = '+54 9 11 7824-4846';
     if (!CFG.leyendaCentenario) CFG.leyendaCentenario = '1926-2026 Centenario';
     if (!CFG.escuela || CFG.escuela === 'Escuela N° 7 Juan Bautista Alberdi, San Miguel, Buenos Aires. Año Centenario 1926-2026') {
@@ -1863,7 +1871,22 @@ function getTelefonoDisplay() {
 
 function getEmailContacto() {
     normalizarConfigContacto();
-    return CFG.email || 'coopep7@gmail.com';
+    return CFG.email || getDefaultEmailContacto();
+}
+
+function renderEmailsContacto() {
+    const email = getEmailContacto();
+    document.querySelectorAll('.js-email-contacto').forEach(el => { el.textContent = email; });
+    document.querySelectorAll('.js-email-link').forEach(el => { el.href = 'mailto:' + email; });
+}
+
+function copyEmailContacto() {
+    copyTxt(getEmailContacto());
+}
+
+function abrirEmailContacto() {
+    window.location.href = 'mailto:' + getEmailContacto();
+    return false;
 }
 
 function getLeyendaCentenario() {
@@ -2012,6 +2035,7 @@ async function syncFromCloud() {
             window._coopCache.config = data.config;
             Object.assign(CFG, data.config);
             normalizarConfigContacto();
+            renderEmailsContacto();
         }
         // Guardar backup local
         saveDB('socios', window._coopCache.socios);
@@ -2145,6 +2169,7 @@ async function testCloudConnection() {
                 window._coopCache.config = data.config;
                 Object.assign(CFG, data.config);
                 normalizarConfigContacto();
+                renderEmailsContacto();
             }
             saveDB('socios', window._coopCache.socios);
             saveDB('bonos',  window._coopCache.bonos);
@@ -2303,6 +2328,7 @@ async function init() {
     }
     console.log('[INIT] Iniciando sistema...');
     loadConfig();
+    renderEmailsContacto();
     renderDivisiones();
     renderMeses();
     
@@ -2340,7 +2366,8 @@ function saveConfig() {
     CFG.escuela       = document.getElementById('cfgEscuela').value;
     CFG.telefono      = document.getElementById('cfgTelefono').value;
     const emailInput  = document.getElementById('cfgEmail');
-    if (emailInput) CFG.email = emailInput.value || 'coopep7@gmail.com';
+    if (emailInput) CFG.email = emailInput.value || getDefaultEmailContacto();
+    renderEmailsContacto();
     localStorage.setItem('coop_config', JSON.stringify(CFG));
     syncToCloud({ config: CFG });
 }
@@ -4706,5 +4733,5 @@ function checkImportVisibility() {
     </div>
 </div>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0b2d52608c1c816',t:'MTc4MTM3MTkyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0baf7b61ed64703',t:'MTc4MTQ1NzIyNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0bb12fe0df79b12',t:'MTc4MTQ1ODM0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
