@@ -3634,6 +3634,7 @@ function verBonoModal(numBono) {
         if (!bono) { console.warn('verBonoModal: bono no encontrado', numBono); return; }
         document.getElementById('modalBody').innerHTML = buildBonoHTML(bono) + `
             <div style="text-align:center; margin-top:15px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button onclick="copiarLinkInscripcion('${bono.numeroBono}')" class="btn btn-info" style="font-size:0.85rem;">🔗 Link inscripción</button>
                 <button onclick="pedirClaveAdmin(() => editarNumeroBono('${numBono}'))" class="btn btn-warning" style="font-size:0.85rem;">✏️ Editar N° Bono</button>
                 <button onclick="closeModal()" class="btn btn-secondary" style="font-size:0.85rem;">Cerrar</button>
             </div>`;
@@ -3647,6 +3648,16 @@ function verBonoModal(numBono) {
 function closeModal() {
     document.getElementById('modalMain').classList.remove('active');
 }
+function copiarLinkInscripcion(numBono) {
+    const bono = getBonos().find(b => b.numeroBono === numBono);
+    if (!bono) return;
+    const base = new URL('inscripcion.html', window.location.href).href;
+    const url = base + '?bono=' + encodeURIComponent(bono.numeroBono || '');
+    const msg = 'Link para completar la inscripción online:\n' + url + '\n\nIngresá con el N° de bono ' + (bono.numeroBono || '') + '. La inscripción se habilita cuando el pago de Planilla está confirmado.';
+    copyTxt(msg);
+    alert('✅ Link de inscripción copiado. Podés enviarlo por WhatsApp.');
+}
+
 
 // ================================================
 // PANEL ADMIN - PAGOS PENDIENTES
@@ -4734,5 +4745,6 @@ function checkImportVisibility() {
     </div>
 </div>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0b2d52608c1c816',t:'MTc4MTM3MTkyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0bb3c503a7872d6',t:'MTc4MTQ2MDAzNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0bc47131dc3ebcc',t:'MTc4MTQ3MDk2Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
 </html>
