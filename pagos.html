@@ -584,6 +584,17 @@
             font-size: 0.85rem;
         }
 
+        .bono-contacto {
+            margin-top: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            opacity: 0.95;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
         .bono-numero-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -998,22 +1009,60 @@
 
         /* ============ PRINT ============ */
         @media print {
+            * {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            /* No ocultar .form-card completo: el bono generado vive dentro de #step5.form-card. */
             .header, .tabs, .buttons-row, .no-print,
             .whatsapp-float, .steps-indicator, .bank-info,
             .modal-close, .alert, .search-bar, .socio-search,
-            .menu-toggle, .nav, .form-card, .resumen-box,
+            .menu-toggle, .nav, .resumen-box,
             .donacion-montos, .meses-grid, .division-select,
-            .concepto-item, .steps-indicator { display: none !important; }
-            .bono-container { 
-                border: 2px solid #000; 
-                max-width: 100%; 
-                margin: 0; 
-                page-break-inside: avoid;
-                font-size: 11pt;
-                box-shadow: none;
+            .concepto-item, .section-title, .section-subtitle,
+            #tab-socios, #tab-bonos, #tab-admin,
+            #step1, #step2, #step3, #step4,
+            #step5 > h3, #step5 > div:first-of-type,
+            #step5 > div:last-child { display: none !important; }
+
+            html, body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
-            .bono-header { padding: 8px 12px; font-size: 10pt; }
-            .bono-header h2 { font-size: 12pt; }
+            .main-container,
+            #tab-pago,
+            #step5,
+            #bonoRender {
+                display: block !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                border: none !important;
+                box-shadow: none !important;
+                background: white !important;
+            }
+            .bono-container {
+                border: 2px solid #000 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                page-break-inside: avoid;
+                break-inside: avoid;
+                font-size: 11pt;
+                box-shadow: none !important;
+            }
+            .bono-header {
+                padding: 8px 12px;
+                font-size: 10pt;
+                background: white !important;
+                color: #000 !important;
+                border-bottom: 2px solid #000;
+            }
+            .bono-header h2 { font-size: 12pt; color: #000 !important; }
+            .bono-header p, .bono-contacto { color: #000 !important; opacity: 1 !important; }
             .bono-field { padding: 3px 0; font-size: 10pt; }
             .bono-body { padding: 8px 12px; }
             .bono-c-header { padding: 4px 8px; font-size: 9pt; }
@@ -1021,8 +1070,6 @@
             .bono-footer { padding: 6px 10px; font-size: 9pt; }
             .bono-numero { padding: 6px; font-size: 14pt; }
             .bono-socio-num { padding: 6px; font-size: 12pt; }
-            body { background: white; margin: 0; padding: 0; }
-            .main-container { margin: 0; padding: 0; max-width: 100%; }
             .modal-content { padding: 0; border: none; box-shadow: none; }
             .modal-overlay { position: static; background: white; }
             @page { size: A4; margin: 10mm; }
@@ -1369,9 +1416,13 @@
             <div class="bank-detail">
                 <span><strong>Titular:</strong> Cooperadora Escuela N° XXX</span>
             </div>
-            <div class=\"bank-detail\" style=\"margin-top:8px; border-top:1px solid #fcd34d; padding-top:8px;\">
+            <div class="bank-detail" style="margin-top:8px; border-top:1px solid #fcd34d; padding-top:8px;">
                 <span><strong>📱 WhatsApp para confirmar pago:</strong> +54 9 11 7824-4846</span>
-                <button class=\"copy-btn\" onclick=\"copyTxt('+54 9 11 7824-4846')\">Copiar</button>
+                <button class="copy-btn" onclick="copyTxt('+54 9 11 7824-4846')">Copiar</button>
+            </div>
+            <div class="bank-detail">
+                <span><strong>✉️ Correo:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="11727e7e6174612651767c70787d3f727e7c">[email&#160;protected]</a></span>
+                <button class="copy-btn" onclick="copyTxt('coopep7@gmail.com')">Copiar</button>
             </div>
         </div>
 
@@ -1563,13 +1614,19 @@
                 <div class="form-group">
                     <label>Nombre Escuela</label>
                     <input type="text" id="cfgEscuela"
-                           value="Escuela N° 7 Juan Bautista Alberdi, San Miguel, Buenos Aires. Año Centenario 1926-2026"
+                           value="Escuela Primaria N°7 Juan Bautista Alberdi"
                            oninput="saveConfig()">
                 </div>
                 <div class="form-group">
                     <label>Teléfono WhatsApp (con código país)</label>
                     <input type="text" id="cfgTelefono"
                            value="5491178244846"
+                           oninput="saveConfig()">
+                </div>
+                <div class="form-group">
+                    <label>Correo de contacto</label>
+                    <input type="email" id="cfgEmail"
+                           value="coopep7@gmail.com"
                            oninput="saveConfig()">
                 </div>
             </div>
@@ -1743,15 +1800,18 @@
 <!-- ================================================================ -->
 <!--                        JAVASCRIPT                                -->
 <!-- ================================================================ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 
 // ================================================
 // CONFIGURACIÓN
 // ================================================
 let CFG = {
-    escuela: 'Escuela N° 7 Juan Bautista Alberdi, San Miguel, Buenos Aires. Año Centenario 1926-2026',
-    direccion: 'SERRANO N° 1326 - SAN MIGUEL BS. AS.',
+    escuela: 'Escuela Primaria N°7 Juan Bautista Alberdi',
+    direccion: 'San Miguel, Buenos Aires',
+    leyendaCentenario: '1926-2026 Centenario',
     telefono: '5491178244846',
+    telefonoDisplay: '+54 9 11 7824-4846',
+    email: 'coopep7@gmail.com',
     adminPass: 'coop2025',
     precioCuota: 5000,
     precioCuaderno: 10000,
@@ -1766,6 +1826,47 @@ let CFG = {
         '6°C','6°D'
     ]
 };
+
+function normalizarConfigContacto() {
+    // Si hay configuración vieja guardada en navegador o Google Sheets, completamos/actualizamos estos datos.
+    if (!CFG.email) CFG.email = 'coopep7@gmail.com';
+    if (!CFG.telefonoDisplay) CFG.telefonoDisplay = '+54 9 11 7824-4846';
+    if (!CFG.leyendaCentenario) CFG.leyendaCentenario = '1926-2026 Centenario';
+    if (!CFG.escuela || CFG.escuela === 'Escuela N° 7 Juan Bautista Alberdi, San Miguel, Buenos Aires. Año Centenario 1926-2026') {
+        CFG.escuela = 'Escuela Primaria N°7 Juan Bautista Alberdi';
+    }
+    if (!CFG.direccion || CFG.direccion === 'SERRANO N° 1326 - SAN MIGUEL BS. AS.') {
+        CFG.direccion = 'San Miguel, Buenos Aires';
+    }
+}
+
+function getNombreEscuela() {
+    normalizarConfigContacto();
+    return CFG.escuela;
+}
+
+function getDireccionEscuela() {
+    normalizarConfigContacto();
+    return CFG.direccion;
+}
+
+function getTelefonoDisplay() {
+    normalizarConfigContacto();
+    if (CFG.telefonoDisplay) return CFG.telefonoDisplay;
+    const tel = (CFG.telefono || '').replace(/\D/g, '');
+    if (tel === '5491178244846') return '+54 9 11 7824-4846';
+    return CFG.telefono || '';
+}
+
+function getEmailContacto() {
+    normalizarConfigContacto();
+    return CFG.email || 'coopep7@gmail.com';
+}
+
+function getLeyendaCentenario() {
+    normalizarConfigContacto();
+    return CFG.leyendaCentenario || '1926-2026 Centenario';
+}
 
 // ================================================
 // BASE DE DATOS
@@ -1907,6 +2008,7 @@ async function syncFromCloud() {
         if (data.config) {
             window._coopCache.config = data.config;
             Object.assign(CFG, data.config);
+            normalizarConfigContacto();
         }
         // Guardar backup local
         saveDB('socios', window._coopCache.socios);
@@ -2039,6 +2141,7 @@ async function testCloudConnection() {
             if (data.config) {
                 window._coopCache.config = data.config;
                 Object.assign(CFG, data.config);
+                normalizarConfigContacto();
             }
             saveDB('socios', window._coopCache.socios);
             saveDB('bonos',  window._coopCache.bonos);
@@ -2224,6 +2327,7 @@ function loadConfig() {
     if (window._coopCache && window._coopCache.config) {
         Object.assign(CFG, window._coopCache.config);
     }
+    normalizarConfigContacto();
 }
 
 function saveConfig() {
@@ -2232,6 +2336,8 @@ function saveConfig() {
     CFG.precioPlanilla= parseInt(document.getElementById('cfgPlanilla').value) || 4000;
     CFG.escuela       = document.getElementById('cfgEscuela').value;
     CFG.telefono      = document.getElementById('cfgTelefono').value;
+    const emailInput  = document.getElementById('cfgEmail');
+    if (emailInput) CFG.email = emailInput.value || 'coopep7@gmail.com';
     localStorage.setItem('coop_config', JSON.stringify(CFG));
     syncToCloud({ config: CFG });
 }
@@ -2973,8 +3079,12 @@ function buildBonoHTML(bono) {
     return `
     <div class="bono-container" id="bonoParaImprimir">
         <div class="bono-header">
-            <h2>🏫 ${CFG.escuela}</h2>
-            <p>${CFG.direccion}</p>
+            <h2>🏫 ${getNombreEscuela()}</h2>
+            <p>${getDireccionEscuela()} — ${getLeyendaCentenario()}</p>
+            <div class="bono-contacto">
+                <span>📱 ${getTelefonoDisplay()}</span>
+                <span>✉️ ${getEmailContacto()}</span>
+            </div>
             <p style="margin-top:5px; font-weight:bold; font-size:1rem;">
                 BONO DE CONTRIBUCIÓN
             </p>
@@ -3035,7 +3145,7 @@ function buildBonoHTML(bono) {
         <div class="bono-footer">
             <span class="bono-estado ${estadoClass}">${estadoTxt}</span>
             <p style="margin-top:10px; font-size:0.8rem;">
-                Enviá este bono + comprobante de transferencia por WhatsApp
+                Enviá este bono + comprobante de transferencia por WhatsApp ${getTelefonoDisplay()} o al correo ${getEmailContacto()}
             </p>
             <p style="font-size:0.75rem; color:#9ca3af; margin-top:4px;">
                 Generado el ${bono.fecha} a las ${bono.hora}
@@ -3051,8 +3161,10 @@ function enviarWA() {
     const bono = PAY.bonoActual;
     if (!bono) return;
 
-    let msg = `🏫 *${CFG.escuela}*\n`;
+    let msg = `🏫 *${getNombreEscuela()}*\n`;
     msg += `━━━━━━━━━━━━━━━━━\n`;
+    msg += `📍 ${getDireccionEscuela()} — ${getLeyendaCentenario()}\n`;
+    msg += `✉️ ${getEmailContacto()}\n`;
     msg += `📄 *BONO DE CONTRIBUCIÓN*\n`;
     msg += `*Bono N° ${bono.numeroBono} | Socio N° ${bono.numeroSocio}*\n`;
     msg += `━━━━━━━━━━━━━━━━━\n\n`;
@@ -3087,44 +3199,83 @@ function enviarWAGeneral() {
 function imprimirBono() {
     const bono = PAY.bonoActual;
     if (!bono) return;
+
     const htmlBono = buildBonoHTML(bono);
-    const win = window.open('', '_blank', 'width=700,height=600');
-    if (!win) { alert('Permití ventanas emergentes para imprimir el bono'); return; }
-    win.document.write(`
-<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bono N° ${bono.numeroBono}</title>
+    const estilosImpresion = `
 <style>
-body { font-family: Arial, sans-serif; margin: 0; padding: 10mm; background: white; }
-.bono-container { border: 2px solid #000; max-width: 100%; margin: 0 auto; }
-.bono-header { background: #1e40af; color: white; padding: 10px 15px; text-align: center; }
-.bono-header h2 { font-size: 14pt; margin: 0; }
-.bono-header p { font-size: 10pt; margin: 4px 0 0; }
+* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+html, body { margin: 0; padding: 0; background: #fff; }
+body { font-family: Arial, sans-serif; padding: 10mm; color: #111; }
+.bono-container { border: 2px solid #000; width: 100%; max-width: 190mm; margin: 0 auto; background: #fff; page-break-inside: avoid; break-inside: avoid; }
+.bono-header { background: #fff; color: #000; padding: 10px 15px; text-align: center; border-bottom: 2px solid #000; }
+.bono-header h2 { font-size: 15pt; margin: 0 0 4px; color: #000; }
+.bono-header p { font-size: 10pt; margin: 4px 0 0; color: #000; opacity: 1; }
+.bono-contacto { margin-top: 5px; font-size: 9pt; font-weight: bold; color: #000; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
 .bono-numero-row { display: grid; grid-template-columns: 1fr 1fr; }
-.bono-numero { background: #fbbf24; color: #1e3a5f; text-align: center; padding: 8px; font-size: 14pt; font-weight: bold; }
-.bono-socio-num { background: #1e40af; color: #fbbf24; text-align: center; padding: 8px; font-size: 12pt; font-weight: bold; }
+.bono-numero { background: #fbbf24; color: #111; text-align: center; padding: 8px; font-size: 15pt; font-weight: bold; border-bottom: 1px solid #000; }
+.bono-socio-num { background: #e5e7eb; color: #111; text-align: center; padding: 8px; font-size: 13pt; font-weight: bold; border-bottom: 1px solid #000; }
 .bono-body { padding: 10px 15px; font-size: 10pt; }
-.bono-field { display: flex; border-bottom: 1px solid #ccc; padding: 3px 0; }
-.bono-field .blabel { font-weight: bold; color: #1e40af; min-width: 140px; font-size: 9pt; }
-.bono-field .bvalue { font-size: 9pt; }
-.bono-conceptos { margin-top: 8px; border: 2px solid #ccc; border-radius: 6px; overflow: hidden; }
-.bono-c-header { background: #1e40af; color: white; padding: 5px 10px; font-weight: bold; font-size: 9pt; display: grid; grid-template-columns: 1fr auto; }
-.bono-c-row { display: grid; grid-template-columns: 1fr auto; padding: 4px 10px; border-bottom: 1px solid #eee; font-size: 9pt; }
+.bono-field { display: flex; border-bottom: 1px solid #ccc; padding: 4px 0; gap: 6px; }
+.bono-field .blabel { font-weight: bold; color: #000; min-width: 140px; font-size: 10pt; }
+.bono-field .bvalue { font-size: 10pt; color: #000; word-break: break-word; }
+.bono-conceptos { margin-top: 8px; border: 2px solid #000; border-radius: 0; overflow: hidden; }
+.bono-c-header { background: #e5e7eb; color: #000; padding: 5px 10px; font-weight: bold; font-size: 10pt; display: grid; grid-template-columns: 1fr auto; border-bottom: 1px solid #000; }
+.bono-c-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 5px 10px; border-bottom: 1px solid #ddd; font-size: 10pt; }
 .bono-c-row:last-child { border-bottom: none; }
-.bono-c-row.total { background: #eff6ff; font-weight: bold; color: #1e40af; border-top: 2px solid #1e40af; }
-.bono-footer { background: #f9fafb; padding: 10px 15px; text-align: center; border-top: 2px dashed #ccc; }
-.bono-estado { display: inline-block; padding: 4px 14px; border-radius: 15px; font-weight: bold; font-size: 9pt; margin-top: 4px; }
-.estado-pendiente { background: #fef3c7; color: #d97706; border: 2px solid #f59e0b; }
-.estado-confirmado { background: #d1fae5; color: #059669; border: 2px solid #10b981; }
-@media print { body { padding: 0; } .bono-container { border: 2px solid #000; } }
-</style></head><body>${htmlBono}</body></html>`);
+.bono-c-row.total { background: #f3f4f6; font-weight: bold; color: #000; border-top: 2px solid #000; }
+.bono-footer { background: #fff; padding: 10px 15px; text-align: center; border-top: 2px dashed #999; }
+.bono-estado { display: inline-block; padding: 4px 14px; border-radius: 15px; font-weight: bold; font-size: 10pt; margin-top: 4px; }
+.estado-pendiente { background: #fff7ed; color: #92400e; border: 2px solid #f59e0b; }
+.estado-confirmado { background: #ecfdf5; color: #065f46; border: 2px solid #10b981; }
+@page { size: A4; margin: 10mm; }
+@media print {
+    body { padding: 0; }
+    .bono-container { max-width: 100%; }
+}
+</style>`;
+
+    const documento = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bono N° ${bono.numeroBono}</title>
+${estilosImpresion}
+</head>
+<body>
+${htmlBono}
+<script>
+window.addEventListener('load', function () {
+    setTimeout(function () {
+        window.focus();
+        window.print();
+    }, 250);
+});
+window.addEventListener('afterprint', function () {
+    setTimeout(function () { window.close(); }, 500);
+});
+<\/script>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank', 'width=800,height=700');
+    if (!win) {
+        alert('No se pudo abrir la ventana de impresión. Se imprimirá esta página. Si no ves el bono, habilitá ventanas emergentes.');
+        window.print();
+        return;
+    }
+    win.document.open();
+    win.document.write(documento);
     win.document.close();
-    setTimeout(() => { win.print(); }, 300);
 }
 
 function descargarTxt() {
     const bono = PAY.bonoActual;
     if (!bono) return;
     let txt = `BONO N° ${bono.numeroBono} | SOCIO N° ${bono.numeroSocio}\n`;
-    txt += `${CFG.escuela}\n`;
+    txt += `${getNombreEscuela()}\n`;
+    txt += `${getDireccionEscuela()} — ${getLeyendaCentenario()}\n`;
+    txt += `WhatsApp: ${getTelefonoDisplay()} | Email: ${getEmailContacto()}\n`;
     txt += `Fecha: ${bono.fecha} ${bono.hora}\n`;
     txt += `Responsable: ${bono.responsable}\n`;
     txt += `Alumno: ${bono.alumno}\n`;
@@ -3866,8 +4017,11 @@ function loginAdmin() {
         document.getElementById('cfgCuota').value    = CFG.precioCuota;
         document.getElementById('cfgCuaderno').value = CFG.precioCuaderno;
         document.getElementById('cfgPlanilla').value = CFG.precioPlanilla;
-        document.getElementById('cfgEscuela').value  = CFG.escuela;
+        document.getElementById('cfgEscuela').value  = getNombreEscuela();
         document.getElementById('cfgTelefono').value = CFG.telefono;
+        if (document.getElementById('cfgEmail')) {
+            document.getElementById('cfgEmail').value = getEmailContacto();
+        }
         showAlertGlobal('✅ Sesión iniciada. Expira en 2 horas.', 'success');
         renderAdminPending();
         renderBonos();
@@ -4549,5 +4703,6 @@ function checkImportVisibility() {
     </div>
 </div>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0b2d52608c1c816',t:'MTc4MTM3MTkyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-</body>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0badcce0d740c2c',t:'MTc4MTQ1NjEyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
