@@ -13,7 +13,7 @@
   <strong>Planilla A4 estilo PDF</strong>
   <button class="primary" onclick="window.print()">🖨️ Imprimir</button>
   <button class="secondary" onclick="toggleJson()">📋 Cargar datos JSON</button>
-  <span class="hint">Esta plantilla usa el PDF original como fondo. Los datos se escriben encima.</span>
+  <span class="hint">Esta plantilla usa el PDF original como fondo. Si se abre desde Admin, carga los datos automáticamente.</span>
   <textarea id="jsonInput" placeholder='Pegá JSON de una inscripción y tocá "Aplicar JSON"'></textarea>
   <button class="secondary" id="applyBtn" onclick="aplicarJson()" style="display:none">Aplicar JSON</button>
 </div>
@@ -150,21 +150,28 @@ const ejemplo = {
   est_dom_calle:'', est_dom_numero:'', est_dom_localidad:'', resp1_apellidos:'', resp1_nombres:'', resp1_dni:'', resp1_celular:'', ddjj_responsable:''
 };
 function getParamData(){
-  const p=new URLSearchParams(location.search); const raw=p.get('data'); if(!raw) return null;
-  try { return JSON.parse(decodeURIComponent(escape(atob(raw)))); } catch(e) { console.warn(e); return null; }
+  const p=new URLSearchParams(location.search);
+  const raw=p.get('data');
+  if(raw){
+    try { return JSON.parse(decodeURIComponent(escape(atob(raw)))); } catch(e) { console.warn(e); }
+  }
+  // Modo normal desde inscripciones-admin.html: los datos se pasan por localStorage.
+  try {
+    const stored = localStorage.getItem('ep7_planilla_a4_data');
+    if(stored) return JSON.parse(stored);
+  } catch(e) { console.warn(e); }
+  return null;
 }
 function setData(data){
   data=data||{};
   document.querySelectorAll('[data-key]').forEach(el=>{ const k=el.dataset.key; el.textContent = formatValue(data[k]||''); });
   document.querySelectorAll('[data-check]').forEach(el=>{ const k=el.dataset.check; const val=String(data[k]||'').toLowerCase(); const expected=String(el.dataset.value||'').toLowerCase(); el.textContent = val && (val===expected || val.includes(expected) || expected.includes(val)) ? 'X' : ''; });
 }
-function formatValue(v){ if(Array.isArray(v)) return v.join(' / '); return String(v||'').replace(/
-/g,' '); }
+function formatValue(v){ if(Array.isArray(v)) return v.join(' / '); return String(v||'').replace(/\n/g,' '); }
 function toggleJson(){ const t=document.getElementById('jsonInput'); const b=document.getElementById('applyBtn'); const show=t.style.display!=='block'; t.style.display=show?'block':'none'; b.style.display=show?'inline-block':'none'; if(show && !t.value.trim()) t.value=JSON.stringify(ejemplo,null,2); }
 function aplicarJson(){ try{ setData(JSON.parse(document.getElementById('jsonInput').value)); } catch(e){ alert('JSON inválido: '+e.message); } }
 window.addEventListener('message', ev=>{ if(ev.data && ev.data.type==='planilla-data') setData(ev.data.data||{}); });
 setData(getParamData() || ejemplo);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0bdef01dd146d4a',t:'MTc4MTQ4ODMyNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0be010df8af6d4a',t:'MTc4MTQ4OTA2Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
