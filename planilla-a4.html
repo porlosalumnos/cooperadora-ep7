@@ -15,6 +15,9 @@
   <button class="secondary" onclick="toggleJson()">📋 Cargar datos JSON</button>
   <button class="secondary" onclick="toggleAjuste()">🎯 Modo ajuste</button>
   <button class="secondary" onclick="guardarAjustes()">💾 Guardar ajustes</button>
+  <button class="secondary" onclick="copiarAjustesParaEnviar()">📤 Copiar ajustes para fijar</button>
+  <button class="secondary" onclick="copiarDatosCargados()">🔎 Copiar datos cargados</button>
+  <button class="secondary" onclick="descargarAjustes()">⬇️ Descargar ajustes</button>
   <button class="secondary" onclick="resetAjustes()">↩️ Reset ajustes</button>
   <span class="hint">Esta plantilla usa el PDF original como fondo. Si algún dato queda corrido, activá Modo ajuste, arrastrá el dato y guardá.</span>
   <textarea id="jsonInput" placeholder='Pegá JSON de una inscripción y tocá "Aplicar JSON"'></textarea>
@@ -200,6 +203,7 @@
   </section>
 </div>
 <script>
+let DATA_CARGADA_PLANILLA = null;
 const ejemplo = {
   insc_anio_lectivo:'2026', est_apellidos:'', est_nombres:'', est_fecha_nacimiento:'', est_dni:'', est_cuil:'', est_identidad_genero:'', est_nacionalidad:'',
   est_dom_calle:'', est_dom_numero:'', est_dom_localidad:'', resp1_apellidos:'', resp1_nombres:'', resp1_dni:'', resp1_celular:'', ddjj_responsable:''
@@ -219,6 +223,7 @@ function getParamData(){
 }
 function setData(data){
   data=normalizarDatos(data||{});
+  DATA_CARGADA_PLANILLA = data;
   document.querySelectorAll('[data-key]').forEach(el=>{ const k=el.dataset.key; el.textContent = formatValue(data[k]||''); });
   document.querySelectorAll('[data-check]').forEach(el=>{ const k=el.dataset.check; const val=String(data[k]||'').toLowerCase(); const expected=String(el.dataset.value||'').toLowerCase(); el.textContent = val && (val===expected || val.includes(expected) || expected.includes(val)) ? 'X' : ''; });
   document.querySelectorAll('[data-bool-list]').forEach(el=>{
@@ -292,6 +297,26 @@ function guardarAjustes(){
   localStorage.setItem('ep7_planilla_a4_ajustes', JSON.stringify(aj));
   alert('Ajustes guardados en este navegador. Si querés que queden fijos para todos, avisame y los incorporo al archivo.');
 }
+function copiarAjustesParaEnviar(){
+  const txt = localStorage.getItem('ep7_planilla_a4_ajustes') || '{}';
+  navigator.clipboard.writeText(txt).then(()=>alert('Ajustes copiados. Pegalos en el chat para incorporarlos fijo al archivo.')).catch(()=>{
+    prompt('Copiá estos ajustes y pegalos en el chat:', txt);
+  });
+}
+
+function copiarDatosCargados(){
+  const txt = JSON.stringify(DATA_CARGADA_PLANILLA || {}, null, 2);
+  navigator.clipboard.writeText(txt).then(()=>alert('Datos cargados copiados. Pegalos en el chat si los textos no aparecen.')).catch(()=>prompt('Copiá estos datos:', txt));
+}
+function descargarAjustes(){
+  const txt = localStorage.getItem('ep7_planilla_a4_ajustes') || '{}';
+  const blob = new Blob([txt], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ajustes_planilla_a4_ep7.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
 function resetAjustes(){ if(confirm('¿Borrar ajustes guardados en este navegador?')){localStorage.removeItem('ep7_planilla_a4_ajustes'); location.reload();} }
 document.addEventListener('mousedown',e=>{
   if(!ajusteActivo || !(e.target.classList.contains('field')||e.target.classList.contains('mark'))) return;
@@ -312,6 +337,6 @@ function aplicarJson(){ try{ setData(JSON.parse(document.getElementById('jsonInp
 window.addEventListener('message', ev=>{ if(ev.data && ev.data.type==='planilla-data') setData(ev.data.data||{}); });
 setData(getParamData() || ejemplo);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0be3c2ceb957a5c',t:'MTc4MTQ5MTQ4OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-</body>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0be6318aa49c816',t:'MTc4MTQ5MzA4Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
