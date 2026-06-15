@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Planilla A4 estilo PDF - Inscripción EP7</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#e5e7eb;font-family:Arial,sans-serif;color:#111}.toolbar{position:sticky;top:0;z-index:10;background:#1e40af;color:#fff;padding:10px 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;box-shadow:0 2px 8px #0003}.toolbar button{border:0;border-radius:18px;padding:9px 14px;font-weight:bold;cursor:pointer}.toolbar .primary{background:#10b981;color:#fff}.toolbar .secondary{background:#fff;color:#1e40af}.toolbar textarea{width:100%;height:100px;margin-top:8px;font-family:monospace;font-size:12px;display:none}.hint{font-size:12px;opacity:.9}.sheet{width:210mm;margin:12px auto}.page{position:relative;width:210mm;height:297mm;background:#fff;overflow:hidden;margin:0 auto 12px;box-shadow:0 4px 16px #0004;page-break-after:always}.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:0}.field{position:absolute;z-index:2;font-size:8.2pt;line-height:1.05;color:#111;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:clip;padding:0 1mm}.mark{position:absolute;z-index:3;font-size:13pt;font-weight:900;line-height:1;color:#111;text-align:center}@media print{.toolbar{display:none}body{background:#fff}.sheet{margin:0;width:210mm}.page{margin:0;box-shadow:none;page-break-after:always}@page{size:A4 portrait;margin:0}}
+*{box-sizing:border-box}body{margin:0;background:#e5e7eb;font-family:Arial,sans-serif;color:#111}.toolbar{position:sticky;top:0;z-index:10;background:#1e40af;color:#fff;padding:10px 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;box-shadow:0 2px 8px #0003}.toolbar button{border:0;border-radius:18px;padding:9px 14px;font-weight:bold;cursor:pointer}.toolbar .primary{background:#10b981;color:#fff}.toolbar .secondary{background:#fff;color:#1e40af}.toolbar textarea{width:100%;height:100px;margin-top:8px;font-family:monospace;font-size:12px;display:none}.hint{font-size:12px;opacity:.9}.sheet{width:210mm;margin:12px auto}.page{position:relative;width:210mm;height:297mm;background:#fff;overflow:hidden;margin:0 auto 12px;box-shadow:0 4px 16px #0004;page-break-after:always}.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:0}.field{position:absolute;z-index:2;font-size:8.2pt;line-height:1.05;color:#111;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:clip;padding:0 1mm}.mark{position:absolute;z-index:3;font-size:13pt;font-weight:900;line-height:1;color:#111;text-align:center}.field{z-index:50!important;color:#000!important;font-size:9pt!important;font-weight:900!important;line-height:1.05!important;white-space:normal!important;overflow:visible!important;text-shadow:0 0 2px #fff,0 0 2px #fff;padding:0 .6mm!important}.mark{z-index:60!important;color:#000!important}.debug-text .field:not(:empty){background:rgba(255,255,0,.45)!important;outline:1px dashed red!important}@media print{.debug-text .field{background:transparent!important;outline:none!important}}@media print{.toolbar{display:none}body{background:#fff}.sheet{margin:0;width:210mm}.page{margin:0;box-shadow:none;page-break-after:always}@page{size:A4 portrait;margin:0}}
 </style>
 </head>
 <body>
@@ -18,6 +18,7 @@
   <button class="secondary" onclick="copiarAjustesParaEnviar()">📤 Copiar ajustes para fijar</button>
   <button class="secondary" onclick="copiarDatosCargados()">🔎 Copiar datos cargados</button>
   <button class="secondary" onclick="descargarAjustes()">⬇️ Descargar ajustes</button>
+  <button class="secondary" onclick="toggleResaltarTextos()">👁️ Resaltar textos</button>
   <button class="secondary" onclick="resetAjustes()">↩️ Reset ajustes</button>
   <span class="hint">Esta plantilla usa el PDF original como fondo. Si algún dato queda corrido, activá Modo ajuste, arrastrá el dato y guardá.</span>
   <textarea id="jsonInput" placeholder='Pegá JSON de una inscripción y tocá "Aplicar JSON"'></textarea>
@@ -271,7 +272,7 @@ function formatValue(v){
 }
 function autoFitCampos(){
   document.querySelectorAll('.field').forEach(el=>{
-    let size=7.8;
+    let size=9;
     el.style.fontSize=size+'pt';
     // achica texto largo para que entren caracteres sin cortarse
     let guard=0;
@@ -342,11 +343,12 @@ document.addEventListener('mousemove',e=>{
   drag.el.style.top=Math.max(0,Math.min(98,top)).toFixed(3)+'%';
 });
 document.addEventListener('mouseup',()=>{drag=null});
+function toggleResaltarTextos(){ document.body.classList.toggle('debug-text'); }
 function toggleJson(){ const t=document.getElementById('jsonInput'); const b=document.getElementById('applyBtn'); const show=t.style.display!=='block'; t.style.display=show?'block':'none'; b.style.display=show?'inline-block':'none'; if(show && !t.value.trim()) t.value=JSON.stringify(ejemplo,null,2); }
 function aplicarJson(){ try{ setData(JSON.parse(document.getElementById('jsonInput').value)); } catch(e){ alert('JSON inválido: '+e.message); } }
 window.addEventListener('message', ev=>{ if(ev.data && ev.data.type==='planilla-data') setData(ev.data.data||{}); });
 setData(getParamData() || ejemplo);
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0be6b6d8b32c816',t:'MTc4MTQ5MzQyNA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-</body>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0be75227cf9c816',t:'MTc4MTQ5MzgyMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
