@@ -58,7 +58,7 @@
     <div class="actions no-print" style="justify-content:space-between;margin-bottom:12px;">
       <button class="btn btn-secondary" onclick="cerrarDetalle()">⬅️ Volver al listado</button>
       <div class="actions">
-        <button class="btn btn-primary" onclick="imprimirDetalle()">🖨️ Imprimir planilla</button>
+        <button class="btn btn-primary" onclick="imprimirDetalle()">🖨️ Imprimir A4 estilo PDF</button>
         <button class="btn btn-success" onclick="marcarImpresaActual()">✅ Marcar como impresa</button>
         <button class="btn btn-warning" onclick="cambiarEstadoActual('incompleta')">⚠️ Marcar incompleta</button>
         <button class="btn btn-info" onclick="cambiarEstadoActual('lista_para_imprimir')">📄 Lista para imprimir</button>
@@ -141,7 +141,22 @@ function buildPrint(r){
   SECCIONES.map(sec=>`<div class="print-section"><h4>${sec[0]}</h4><div class="print-grid">${sec[1].map(([k,l])=>`<div class="print-item"><strong>${esc(l)}</strong><span>${esc(r[k]||'')}</span></div>`).join('')}</div></div>`).join('')+
   `<div class="print-section"><h4>Firmas</h4><div class="print-grid"><div class="print-item"><strong>Firma persona responsable</strong><span>____________________________</span></div><div class="print-item"><strong>Aclaración</strong><span>____________________________</span></div><div class="print-item"><strong>Firma Directora/Director</strong><span>____________________________</span></div><div class="print-item"><strong>Fecha de impresión</strong><span>${new Date().toLocaleDateString('es-AR')}</span></div></div></div>`;
 }
-function imprimirDetalle(){if(!ACTUAL)return;window.print();}
+function imprimirDetalle(){
+  if(!ACTUAL){ showStatus('Primero abrí una inscripción.', 'err'); return; }
+  try {
+    localStorage.setItem('ep7_planilla_a4_data', JSON.stringify(ACTUAL));
+    const url = 'planilla-a4.html?ts=' + Date.now();
+    const win = window.open(url, '_blank');
+    if(!win) {
+      showStatus('No se pudo abrir la planilla A4. Permití ventanas emergentes o abrí planilla-a4.html manualmente.', 'err');
+      return;
+    }
+    showStatus('✅ Se abrió la plantilla A4. Desde esa ventana tocá Imprimir.', 'ok');
+  } catch(e) {
+    console.error(e);
+    showStatus('Error al preparar la planilla A4: ' + esc(e.message), 'err');
+  }
+}
 
 async function updateInterno(id,updates){
   const c=assertConfig();
@@ -164,5 +179,6 @@ async function cambiarEstadoActual(estado){
 
 cargarConfig();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0bb7731fe5b4703',t:'MTc4MTQ2MjQ0OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0be191848f78700',t:'MTc4MTQ5MDA1MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
